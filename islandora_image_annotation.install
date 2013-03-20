@@ -9,16 +9,19 @@
  * Implements hook_requirements().
  */
 function islandora_image_annotation_requirements($phase) {
+  $requirements = array();
   if ($phase == 'install') {
     module_load_include('inc', 'islandora', 'includes/tuque');
     if (!IslandoraTuque::exists()) {
-      return array(array(
-          'title' => 'Tuque',
+      $requirements['tuque_library'] = array(
+       'title' => 'Tuque',
           'description' => 'The Islandora Basic Image solution pack requires the Tuque library.',
           'severity' => REQUIREMENT_ERROR,
-          ));
+      );
     }
+   
   }
+  return $requirements;
 }
 
 /**

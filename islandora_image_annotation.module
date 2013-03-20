@@ -277,29 +277,28 @@ function islandora_image_annotation_preprocess_islandora_image_annotation_solr(&
 /**
  * Implements hook_islandora_required_objects().
  */
-function islandora_image_annotation_islandora_required_objects() {
-  // module path
+function islandora_image_annotation_islandora_required_objects(IslandoraTuque $connection) {
+  
   $module_path = drupal_get_path('module', 'islandora_image_annotation');
-
+  // OAC Content Model
+  $oac_content_model = $connection->repository->constructObject('islandora:OACCModel');
+  $oac_content_model->owner = 'fedoraAdmin';
+  $oac_content_model->label = 'Islandora Annotation CModel';
+  $oac_content_model->models = 'fedora-system:ContentModel-3.0';
+  
+  // DS-COMPOSITE-MODEL Datastream
+  $datastream = $oac_content_model->constructDatastream('DS-COMPOSITE-MODEL', 'X');
+  $datastream->label = 'DS-COMPOSITE-MODEL';
+  $datastream->mimetype = 'text/xml';
+  $datastream->setContentFromFile("$module_path/xml/islandora_image_annotation_ds_composite_model.xml", FALSE);
+  $oac_content_model->ingestDatastream($datastream);
+  
   return array(
-    'islandora_image_annotation' => array(
+  'islandora_image_annotation' => array(
       'title' => 'Islandora image annotations',
       'objects' => array(
-        array(
-          'pid' => 'islandora:OACCModel',
-          'label' => 'Islandora Annotation CModel',
-          'cmodel' => 'fedora-system:ContentModel-3.0',
-          'datastreams' => array(
-            array(
-              'dsid' => 'DS-COMPOSITE-MODEL',
-              'label' => 'DS-COMPOSITE-MODEL',
-              'mimetype' => 'text/xml',
-              'control_group' => 'X',
-              'datastream_file' => "$module_path/xml/islandora_image_annotation_ds_composite_model.xml",
-            ),
-          ),
-        ),
-      ),
-    ),
+        $oac_content_model,
+      )
+    )
   );
 }

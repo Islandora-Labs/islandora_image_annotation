@@ -1,6 +1,23 @@
+SUMMARY
+-------
+
 Adds the ability to add annotations to images.  This solution pack piggy backs
 on top of other Islandora Solution Packs such as basic_image and large_image by 
 adding a new tab to existing views.  This tab includes the annotation tools.
+
+
+REQUIREMENTS
+------------
+
+INSTALLATION
+------------
+
+Google Analytics tracking should be setup independent of this reporting aspect. A Google Analytics module is available for tracking
+(http://www.drupal.org/project/google_analytics).
+
+
+CONFIGURATION
+-------------
 
 To enable the annotation tab for a content model visit the Islandora admin section
 and choose Image annotation.  From there you can choose which CModels you want 
@@ -12,6 +29,10 @@ for categories.
 Annotation categories also depend on the selected radio button under Annotation 
 Categories.  If you want to depend on taxonomies choose administrator defined.
 
+
+CUSTOMIZATION
+-------------
+
 Searching:
 Included is an xslt designed for gsearch.  If this xslt is included in your existing 
 gsearch index xslt it will index the Annotation fields and make them searchable 
@@ -21,3 +42,13 @@ have to update them as well.
 
 If you have solr configured properly and have Annotation Categories set as user 
 defined you will have a type ahead for the Annotations categories section.
+
+TROUBLESHOOTING
+---------------
+
+
+F.A.Q.
+------
+
+If you want the annotations for book, do not check the book content model on the admin page. In order 
+for annotations for book you check the paged content model.
