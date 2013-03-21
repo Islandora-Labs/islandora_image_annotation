@@ -1,11 +1,15 @@
 <?php
 /**
- * @file islandora-solr-grid.tpl.php
+ * @file
+ * islandora-solr-grid.tpl.php
+ *
  * Islandora solr primary results template file for
  *
  * Variables available:
- * - $variables: all array elements of $variables can be used as a variable. e.g. $base_url equals $variables['base_url']
- * - $base_url: The base url of the current website. eg: http://example.com/drupal .
+ * - $variables: all array elements of $variables can be used as a variable.
+ *      e.g: $base_url equals $variables['base_url']
+ * - $base_url: The base url of the current website.
+ *      e.g: http://example.com/drupal .
  * - $user: The user object.
  * - $solr_default_img: default solr image. Used when no thumbnail is available.
  *

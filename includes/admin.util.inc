@@ -1,18 +1,20 @@
 <?php
 /**
  * @file
- * helper functions for the admin interface
+ * Helper functions for the admin interface.
  */
 
 /**
- * 
- * themes the form table.
+ * Themes the form table.
  *
- * @param array $element Drupal Form Element.
+ * @param array $variables
+ *   An array containing variables used in the theme.
+ *
  * @return string
+ *   The marked up output.
  */
 function theme_islandora_annotation_table($variables) {
-  // set form
+  // Set form.
   $form = $variables['form'];
   $rows = array();
 
@@ -27,7 +29,7 @@ function theme_islandora_annotation_table($variables) {
       $row[] = array('data' => drupal_render($form['DSID'][$key]));
       $row[] = array('data' => drupal_render($form['TAX'][$key]));
 
-      // add to rows
+      // Add to rows.
       $rows[] = array('data' => $row, 'class' => array('draggable'));
     }
   }
@@ -41,13 +43,25 @@ function theme_islandora_annotation_table($variables) {
   $header[] = array('data' => t('DSID'));
   $header[] = array('data' => t('Taxonomy'));
 
-  // render form
+  // Render form.
   $output = '';
-  $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'annotation_admin_table')));
+  $output .= theme('table', array(
+    'header' => $header,
+    'rows' => $rows,
+    'attributes' => array(
+      'id' => 'annotation_admin_table',
+    ),
+  ));
   $output .= drupal_render_children($form);
   return $output;
 }
 
+/**
+ * Retrieves content models from Fedora.
+ *
+ * @return array
+ *   An array containing key value pairs of content model pids and titles.
+ */
 function islandora_annotation_get_content_models() {
   module_load_include('inc', 'islandora', 'includes/tuque');
   $repository = new IslandoraTuque();
@@ -76,8 +90,16 @@ function islandora_annotation_get_content_models() {
   return $return_array;
 }
 
+/**
+ * Retrieves datastream ids from the DS-COMPOSITE-MODEL.
+ *
+ * @param string $pid
+ *   Pid of the object.
+ *
+ * @return array
+ *   Array containing the DSIDs of datastreams.
+ */
 function get_annotation_dsids_from_dscomp($pid) {
-
   module_load_include('inc', 'islandora', 'includes/tuque');
   $fedora_object = islandora_object_load($pid);
   $datastream = $fedora_object['DS-COMPOSITE-MODEL'];
@@ -100,6 +122,12 @@ function get_annotation_dsids_from_dscomp($pid) {
   return $output;
 }
 
+/**
+ * Retrieve a full list of collections from Fedora.
+ *
+ * @return array
+ *   An array in the form of cmodel_pid => cmodel_title.
+ */
 function islandora_annotation_get_collections() {
   module_load_include('inc', 'islandora', 'includes/tuque');
   $repository = new IslandoraTuque();
@@ -126,6 +154,12 @@ function islandora_annotation_get_collections() {
   return $return_array;
 }
 
+/**
+ * Retrieves all taxonomies defined within Drupal.
+ *
+ * @return array
+ *   A key value pair array containing the vid and taxonomy name.
+ */
 function islandora_annotation_get_taxonomies() {
   module_load_include('module', 'taxonomy', 'module');
   $taxonomies = taxonomy_get_vocabularies();

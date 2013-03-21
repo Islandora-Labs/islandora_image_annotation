@@ -2,28 +2,27 @@
 
 /**
  * @file
- * functions to build and retrieve oac rdf datastreams in fedora
+ * Functions to build and retrieve oac rdf datastreams in fedora.
  */
 
 /**
- * Builds initial suite of xml's for Shared Canvas installation
+ * Builds initial suite of xml's for Shared Canvas installation.
  *
  * @global url $base_url
- * @param string $pid
  *
+ * @param string $pid
+ *   Pid of the object.
  */
 function build_manifest($pid) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
   $dsid = islandora_image_annotation_get_dsid_from_model($pid);
   global $base_url;
-  //module_load_include('inc', 'islandora', 'api/fedora_item');
-  //$item = new Fedora_Item($pid);
   $item = islandora_object_load($pid);
 
   $title = $item->label;
   $file_array = array();
   $doc_url = "$base_url/islandora/object/$pid/datastream/$dsid/view/";
-  //xml datastreams used by Shared Canvas must be echoed though ajax.
+  // XML datastreams used by Shared Canvas must be echoed though ajax.
   $doc_path_url = "$base_url/islandora/anno/serve/$pid";
   $dimensions = get_height_and_width($pid);
 
@@ -39,10 +38,7 @@ function build_manifest($pid) {
     mkdir($file_path, 0777, TRUE);
   }
   foreach ($file_array as $name => $content) {
-    //file_put_contents("$file_path/$name.xml", $content);
-    //$item->add_or_modify_by_reference("$base_url/$file_path/$name.xml", $name, $name, 'text/plain', FALSE, 'Modified by Islandora API');
     $item["$name"]->content = $content;
-    //file_delete("$file_path/$name.xml");
   }
   rmdir($file_path);
   rmdir(file_directory_path() . "/$flat_pid");
@@ -50,11 +46,16 @@ function build_manifest($pid) {
 }
 
 /**
- * returns basic manifest for unpopulated document - ready for test
+ * Returns basic manifest for unpopulated document.
  *
- * @global url $base_url
- * @param string $pid
- * @return xml
+ * @param URL $doc_url
+ *   URL of the doc.
+ *
+ * @param URL $doc_path_url
+ *   Path where we are looking for the manifest.
+ *
+ * @return XML
+ *   XML generated in the RDF builder.
  */
 function get_manifest($doc_url, $doc_path_url) {
   $timestamp = date(DATE_W3C);
@@ -76,7 +77,6 @@ function get_manifest($doc_url, $doc_path_url) {
   $children[] = $rdf->build_child('dcterms:modified', NULL, "$timestamp");
   $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
   $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
-  // $children[] = $rdf->build_child('dcterms:creator', array('Emic Shared Canvas'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "urn:uuid:07fbb971-6acb-48ce-9ed4-1789dfe5b3a0";
@@ -118,10 +118,27 @@ function get_manifest($doc_url, $doc_path_url) {
 }
 
 /**
- * Returns a NormalSequence document. 
+ * Returns a NormalSequence document.
+ *
  * We consider annotate single pages, so the document refrences a single canvas.
+ *
  * @param URL $doc_url
- * @return xml
+ *   The URL of the document.
+ *
+ * @param URL $doc_path_url
+ *   The path to the normal sequence XML file.
+ *
+ * @param string $pid
+ *   The pid of the object.
+ *
+ * @param int $height
+ *   The height.
+ *
+ * @param int $width
+ *   The width.
+ *
+ * @return XML
+ *   XML generated in the RDF builder.
  */
 function get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/rdf_builder');
@@ -145,7 +162,6 @@ function get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width) {
   $children[] = $rdf->build_child('dcterms:modified', NULL, "$timestamp");
   $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
   $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
-  // $children[] = $rdf->build_child('dcterms:creator', array('rdf:resource' => 'Emic Shared Canvas'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_url/Canvas";
@@ -167,25 +183,32 @@ function get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width) {
 }
 
 /**
- * Creates and returns Imageannotation Stream for new Shared Canvas
- * @param url $doc_url
- * @param url $doc_path_url
- * @param integer $height
- * @param integer $width
- * @param string $title
- * @return string
+ * Creates and returns Imageannotation Stream for new Shared Canvas.
  *
+ * @param URL $doc_url
+ *   The URL of the document.
+ *
+ * @param URL $doc_path_url
+ *   The path to the image annotations XML.
+ *
+ * @param int $height
+ *   The height of the annotation.
+ *
+ * @param int $width
+ *   The width of the annotation.
+ *
+ * @param string $title
+ *   The title of the annotation.
+ *
+ * @return XML
+ *   XML generated in the RDF builder.
  */
 function get_image_annotations($doc_url, $doc_path_url, $height, $width, $title) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/rdf_builder');
-  $timestamp = date(DATE_W3C);
   $rdf = new IslandoraRdfBuilder();
   $rdf->root->setAttribute('xmlns:exif', "http://www.w3.org/2003/12/exif/ns#");
   $rdf->root->setAttribute('xmlns:cnt', "http://www.w3.org/2008/content#");
   $rdf->root->setAttribute('xmlns:oa', "http://www.w3.org/ns/openannotation/core/");
-  $option_uuid = generate_uuid();
-  $first_resource = generate_uuid();
-  $timestamp = date(DATE_W3C);
   $option_uuid = generate_uuid();
   $first_resource = generate_uuid();
   $timestamp = date(DATE_W3C);
@@ -194,12 +217,11 @@ function get_image_annotations($doc_url, $doc_path_url, $height, $width, $title)
   $children = array();
   $children[] = $rdf->build_child('ore:aggregates', array('rdf:resource' => 'urn:uuid:46e74f54-a8e2-41f1-a3a1-24660472c584'));
   $children[] = $rdf->build_child('rdf:first', array('rdf:resource' => 'urn:uuid:b6cf1868-68f9-4994-90dd-240a4a959358'));
-//  $children[] = $rdf->build_child('rdf:rest', array('rdf:resource' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil'));
   $children[] = $rdf->build_child('rdf:rest', array('rdf:nodeID' => 'bCfJsWeh546'));
   $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
   $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageAnnotationList'));
   $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List'));
-// todo add elements for aggregated annotations
+  // @TODO add elements for aggregated annotations.
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_path_url/ImageAnnotations/ImageAnnotations.xml";
@@ -207,7 +229,6 @@ function get_image_annotations($doc_url, $doc_path_url, $height, $width, $title)
   $children[] = $rdf->build_child('dcterms:modified', NULL, "$timestamp");
   $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
   $children[] = $rdf->build_child('ore:describes', array('rdf:resource' => "$doc_url/ImageAnnotations"));
-//  $children[] = $rdf->build_child('dcterms:creator', array('rdf:resource' => 'Emic Shared Canvas'));
   $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
   $rdf->addDescriptionNode($name, $children);
 
@@ -252,10 +273,16 @@ function get_image_annotations($doc_url, $doc_path_url, $height, $width, $title)
 }
 
 /**
- * Creates and returns AnnotationList for new Shared Canvas
- * @param url $doc_url
- * @param url $doc_path_url
- * @return string
+ * Creates and returns AnnotationList for new Shared Canvas.
+ *
+ * @param URL $doc_url
+ *   The document URL.
+ *
+ * @param URL $doc_path_url
+ *   Path document path URL.
+ *
+ * @return XML
+ *   XML generated in the RDF builder.
  */
 function get_annotationList($doc_url, $doc_path_url) {
 
@@ -289,11 +316,15 @@ function get_annotationList($doc_url, $doc_path_url) {
 }
 
 /**
- * Retrieves height and width from the RELS-INT  if its there
- * falls back to djatoka if it's not there.  
- * @param pid $pid
+ * Retrieves height and width from the RELS-INT.
+ *
+ * Falls back to Djatoka if the dimensions are not stored
+ *
+ * @param string $pid
+ *   The pid of the object.
+ *
  * @return array
- * Array has two values - height and width
+ *   Key value array containing the height and width with their values.
  */
 function get_height_and_width($pid) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
@@ -310,18 +341,18 @@ function get_height_and_width($pid) {
     $image_height = $sxml->xpath('//rdf:Description[@rdf:about="info:fedora/' . $pid . '/' . $dsid . '"]/islandora-relsint:height');
     $image_width = $sxml->xpath('//rdf:Description[@rdf:about="info:fedora/' . $pid . '/' . $dsid . '"]/islandora-relsint:width');
     if (!$image_height || !$image_width) {
-      //we maybe looking at a page of a book which might have a different namespace
+      // Page of a book might have a different namespace.
       $image_height = $sxml->xpath('//rdf:Description[@rdf:about="info:fedora/' . $pid . '/' . $dsid . '"]/islandora-page:height');
       $image_width = $sxml->xpath('//rdf:Description[@rdf:about="info:fedora/' . $pid . '/' . $dsid . '"]/islandora-page:width');
     }
     if (!$image_height || !$image_width) {
-      //have seen fits:imageHeight fits:imageWidth in the wild
+      // Have seen fits:imageHeight fits:imageWidth in the wild.
       $image_height = $sxml->xpath('//rdf:Description[@rdf:about="info:fedora/' . $pid . '/' . $dsid . '"]/fits:imageHeight');
       $image_width = $sxml->xpath('//rdf:Description[@rdf:about="info:fedora/' . $pid . '/' . $dsid . '"]/fits:imageWidth');
     }
-    //we could have a rels-int without a height and width for our object
+    // We could have a RELS-INT without a height and width for our object.
     if (!$image_height || !$image_width) {
-      $height_width_arr = get_image_dimenions_drupal($pid, $dsid, TRUE);
+      $height_width_arr = get_image_dimensions_drupal($pid, $dsid, TRUE);
     }
     else {
       $image_height = (string) $image_height[0];
@@ -332,30 +363,38 @@ function get_height_and_width($pid) {
       );
     }
   }
-  else {//fall back to djatoka  
-    return get_image_dimenions_drupal($pid, $dsid, TRUE);
+  else {
+    // Fall back to Djatoka.
+    return get_image_dimensions_drupal($pid, $dsid, TRUE);
   }
   return $height_width_arr;
 }
 
 /**
+ * Retrieve image dimensions of an object from Djatoka.
  *
  * @param string $pid
+ *   Pid of the object.
+ *
  * @param string $dsid
- * @param boolean $update
- *  if true we will call another function to update the RELS-INT with the height and width
+ *   The DSID we are searching in.
+ *
+ * @param bool $update
+ *   Whether we update the RELS-INT with the height and width.
+ *
  * @return array
- * @throws Exception 
- *   if the target datastream does not exist 
+ *   Key value array containing the height, width, extension, mime and size.
+ *
+ * @throws Exception
+ *   Target datastream does not exist.
  */
-function get_image_dimenions_drupal($pid, $dsid, $update = FALSE) {
+function get_image_dimensions_drupal($pid, $dsid, $update = FALSE) {
 
   if (empty($dsid)) {
     throw Exception('Could not find a datastream id to load for image height and width');
   }
   $object = islandora_object_load($pid);
   $image_file = file_save_data($object[$dsid]->content, 'temporary://');
-  //$image_file->filemime = $object[$dsid]->mimetype;
   $real_path = drupal_realpath($image_file->uri);
   $info = image_get_info($real_path);
   if (empty($info)) {
@@ -367,17 +406,23 @@ function get_image_dimenions_drupal($pid, $dsid, $update = FALSE) {
     update_or_create_relsint($pid, $dsid, $info);
   }
   file_delete($image_file);
-  return $info; //$height_width_arr;
+  return $info;
 }
 
 /**
- * TODO: modify this function as it could be DESTRUCTIVE if something else is 
- * being stored in RELS-INT
- * update the object so the RELS-INT datastream contains the height and width of the 
- * selected datastream.  We are using the standard islandora RELS-INT namespace
+ * Update the object's RELS-INT datastream to contains the height and width.
+ *
+ * @TODO Modify this function as it could be DESTRUCTIVE if something else is
+ * being stored in RELS-INT.
+ *
  * @param string $pid
+ *   The pid of the object.
+ *
  * @param string $dsid
- * @param array $height_width_arr 
+ *   The DSID which this RELS-INT applies to.
+ *
+ * @param array $height_width_arr
+ *   An array containing the height and width of the image.
  */
 function update_or_create_relsint($pid, $dsid, $height_width_arr) {
   if (!isset($height_width_arr['width']) || !isset($height_width_arr['height'])) {
@@ -393,25 +438,32 @@ function update_or_create_relsint($pid, $dsid, $height_width_arr) {
 XML;
   $item = islandora_object_load($pid);
   if (!isset($item[$dsid])) {
-    //no datastream to create a rels-int for
+    // No datastream to create the RELS-INT on.
     return FALSE;
   }
   if (!isset($item['RELS-INT'])) {
     $to_replace = array('XPID', 'XWIDTH', 'XHEIGHT', 'XTIFF');
-    $replace_with = array($pid, $height_width_arr['width'], $height_width_arr['height'], $dsid);
+    $replace_with = array(
+      $pid,
+      $height_width_arr['width'],
+      $height_width_arr['height'],
+      $dsid,
+    );
     $rels_int_str = str_replace($to_replace, $replace_with, $rels_int_str);
     try {
       $rels_int_ds = $item->constructDatastream('RELS-INT', 'X');
       $rels_int_ds->mimetype = 'text/xml';
       $rels_int_ds->label = 'RELS-INT';
       $rels_int_ds->content = $rels_int_str;
-      $item->ingestDatastream($rels_int_ds); //create rels-int
-    } catch (Exception $e) {
+      // Create RELS-INT.
+      $item->ingestDatastream($rels_int_ds);
+    }
+    catch (Exception $e) {
       watchdog('islandora', 'Error adding RELS-INT stream for object %pid', array('pid%' => $pid));
     }
   }
   else {
-    //we are assuming our entries do not exist as we have just tried to load this info
+    // We assume entries do not exist as we have just tried to load this info.
     $rels_ds = $item['RELS-INT'];
     $doc = DomDocument::loadXML($rels_ds->content);
     $rdf = $doc->documentElement;
@@ -432,10 +484,15 @@ XML;
 }
 
 /**
- * Echos Fedora streams for javascript retrieval
+ * Echoes Fedora streams for javascript retrieval.
+ *
  * @global url $base_url
+ *
  * @param string $pid
+ *   The pid of a object.
+ *
  * @param string $stream
+ *   Which stream we are retrieving.
  */
 function islandora_serve($pid, $stream, $width = NULL, $height = NULL) {
   global $base_url;
@@ -454,8 +511,6 @@ function islandora_serve($pid, $stream, $width = NULL, $height = NULL) {
   $height = $dimensions['height'];
   $width = $dimensions['width'];
 
-
-
   if ($stream == 'NormalSequence') {
     $sequence = get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width);
     echo $sequence;
@@ -469,8 +524,10 @@ function islandora_serve($pid, $stream, $width = NULL, $height = NULL) {
 }
 
 /**
- * Generates uuid
+ * Generates uuid.
+ *
  * @return uuid
+ *   Returns the uuid.
  */
 function generate_uuid() {
   return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)

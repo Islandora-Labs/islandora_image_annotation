@@ -2,11 +2,13 @@
 
 /**
  * @file
- * build rdf like xml for oac standard
- * 
- * Convenicence class to build RDF objects
+ * Build RDF like XML for OAC standard.
  *
+ * Convenicence class to build RDF objects.
+ *
+ * @TODO: Conform to Drupal Coding Standards.
  */
+
 class IslandoraRdfBuilder {
 
   public $dom_doc = NULL;

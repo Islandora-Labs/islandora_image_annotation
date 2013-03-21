@@ -14,12 +14,11 @@ function islandora_image_annotation_requirements($phase) {
     module_load_include('inc', 'islandora', 'includes/tuque');
     if (!IslandoraTuque::exists()) {
       $requirements['tuque_library'] = array(
-       'title' => 'Tuque',
-          'description' => 'The Islandora Basic Image solution pack requires the Tuque library.',
-          'severity' => REQUIREMENT_ERROR,
+        'title' => 'Tuque',
+        'description' => 'The Islandora Basic Image solution pack requires the Tuque library.',
+        'severity' => REQUIREMENT_ERROR,
       );
     }
-   
   }
   return $requirements;
 }
@@ -31,7 +30,7 @@ function islandora_image_annotation_requirements($phase) {
  */
 function islandora_image_annotation_install() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
-  // install solution pack object(s)
+  // Install solution pack object(s).
   islandora_install_solution_pack('islandora_image_annotation');
 }
 
@@ -40,6 +39,6 @@ function islandora_image_annotation_install() {
  */
 function islandora_image_annotation_uninstall() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
-  // uninstall callback
+  // Uninstall callback.
   islandora_install_solution_pack('islandora_image_annotation', 'uninstall');
 }

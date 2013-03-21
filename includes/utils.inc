@@ -2,13 +2,17 @@
 
 /**
  * @file
- * utility functions for islandora image annotation module
+ * Utility functions for islandora image annotation module.
  */
 
 /**
- * 
- * @param type $pid
- * @return type
+ * Retrieves the first found datastream from our default list from the object.
+ *
+ * @param string $pid
+ *   The pid of the object.
+ *
+ * @return Datastream
+ *   The datastream retrieved.
  */
 function islandora_image_annotation_get_dsid($pid) {
   $object = islandora_object_load($pid);
@@ -25,12 +29,16 @@ function islandora_image_annotation_get_dsid($pid) {
 }
 
 /**
- * checks our admin table for an allowed datastream
+ * Checks our admin table for an allowed datastream.
+ *
  * @param string $pid
- * @return string 
+ *   The pid of an object.
+ *
+ * @return string
+ *   The DSID of the annotation.
  */
 function islandora_image_annotation_get_dsid_from_model($pid) {
-  $dsid = 'OBJ'; //default
+  $dsid = 'OBJ';
   $item = islandora_object_load($pid);
   $models = $item->models;
   if (($key = array_search('fedora-system:FedoraObject-3.0', $models)) !== FALSE) {

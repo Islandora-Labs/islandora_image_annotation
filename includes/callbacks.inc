@@ -2,15 +2,18 @@
 
 /**
  * @file
- * functions that implement ajax callbacks
- * 
+ * Functions that implement ajax callbacks.
  */
 
 /**
- * Ajax callback for Shared Canvas
+ * Ajax callback for Shared Canvas.
+ *
  * Supplies the basic data, including maifest uri
+ *
  * @global url $base_url
+ *
  * @param string $pid
+ *   The pid of a object.
  */
 function islandora_canvas_setup($pid) {
   global $base_url;
@@ -21,11 +24,7 @@ function islandora_canvas_setup($pid) {
   $item = islandora_object_load($pid);
   $rels = $item->relationships->get('info:fedora/fedora-system:def/model#', 'hasModel');
   $cmodel = $rels[0]['object']['value'];
-  // $stroke_width = $item->relationships->get(ISLANDORA_RELS_EXT_URI, 'strokeWidth');
-  //$stroke_width = $stroke_width[0]['object']['value'];
-  //if(empty($stroke_width)){
   $stroke_width = variable_get('annotation_stroke_width', '1%');
-  // }
   $mappings = variable_get('islandora_annotation_mappings', array());
   $optimized = variable_get('islandora_annotation_optimized', TRUE);
   $dropdown = variable_get('islandora_annotation_enforce_taxonomy', TRUE);
@@ -58,7 +57,7 @@ function islandora_canvas_setup($pid) {
   $results['islandora_update_annotation'] = "$base_url/islandora/anno/update_annotation/";
   $results['islandora_base_url'] = "$base_url/";
   $results['islandora_anno_use_title_vocab'] = variable_get('annotation_use_title_vocabulary', FALSE);
-  $results['islandora_anno_stroke_width'] = $stroke_width; //default
+  $results['islandora_anno_stroke_width'] = $stroke_width;
   $results['islandora_anno_stroke_widths'] = variable_get('annotation_stroke_widths', '.3 .6. .9  1.2 1.5');
   $results['position'] = $position;
   $results['pages'] = $pages;
@@ -72,9 +71,12 @@ function islandora_canvas_setup($pid) {
 }
 
 /**
- * Creates annotation objects from html supplied by Shared Canvas
+ * Creates annotation objects from html supplied by Shared Canvas.
+ *
  * @global url $base_url
+ *
  * @param string $pid
+ *   The pid of a object.
  */
 function islandora_add_annotation($pid) {
   global $user;
@@ -97,14 +99,12 @@ function islandora_add_annotation($pid) {
     $urn = (string) $value;
   }
   $namespace = substr($pid, 0, strpos($pid, ":"));
-  //$item = islandora_ingest_get_object('islandora:OACCModel', $pid, 'isMemberOf', $namespace);
   $relationship = array();
   $relationship['relationship'] = 'isMemberOf';
   $relationship['pid'] = $pid;
   $item = islandora_prepare_new_object($namespace, $labels[0], $datastreams = array(), array('islandora:OACCModel'), array($relationship));
   $item->label = (string) $labels[0];
 
-  //$item->relationships->add(FEDORA_MODEL_URI, 'hasModel', 'islandora:OACCModel');
   $item->relationships->add(ISLANDORA_RELS_EXT_URI, 'targetedBy', $user->name, TRUE);
   $item->relationships->add(ISLANDORA_RELS_EXT_URI, 'targets', $pid);
   if ($color) {
@@ -119,16 +119,26 @@ function islandora_add_annotation($pid) {
   $new_ds->mimetype = 'text/xml';
   $new_ds->content = $annotation_xml;
   $item->ingestDatastream($new_ds);
-  //islandora_ingest_add_object($item);
-  
+
   $item->repository->ingestObject($item);
-  //TODO: reimplement this when islandora 7 refactoring is done
+  // @TODO: reimplement this when islandora 7 refactoring is done
   //foreach (islandora_build_hook_list(ISLANDORA_POST_INGEST_HOOK, $item->models) as $hook) {
   //  module_invoke_all($hook, $item);
   //}
   echo $item->id;
 }
 
+/**
+ * Adds the object to the repository and calls hooks.
+ *
+ * @TODO Replace with islandora_add_object and Tuque wrapper hooks?
+ *
+ * @param FedoraObject $object
+ *   A FedoraObject.
+ *
+ * @return FedoraObject
+ *   A FedoraObject.
+ */
 function islandora_ingest_add_object(&$object) {
   drupal_alter('islandora_pre_ingest', $object);
 
@@ -144,9 +154,13 @@ function islandora_ingest_add_object(&$object) {
 }
 
 /**
- * transforms input from SharedCanvas to AnnotationList
+ * Transforms input from SharedCanvas to AnnotationList.
+ *
  * @param string $xml_in
+ *   The XML we are transforming.
+ *
  * @return string
+ *   The transformed XML.
  */
 function islandora_shared_transform_annotation_list($xml_in, $input_type) {
 
@@ -157,11 +171,12 @@ function islandora_shared_transform_annotation_list($xml_in, $input_type) {
   $path = drupal_get_path('module', 'islandora_image_annotation') . '/xslt/';
   $xslts = array(
     'html' => $path . 'html_to_AnnotationList.xsl',
-    'rdf' => $path . 'AnnotationList_to_html.xsl'
+    'rdf' => $path . 'AnnotationList_to_html.xsl',
   );
   try {
     $proc = new XsltProcessor();
-  } catch (Exception $e) {
+  }
+  catch (Exception $e) {
     drupal_set_message(t('@e', array('@e' => check_plain($e->getMessage()))), 'error');
     return " ";
   }
@@ -178,10 +193,14 @@ function islandora_shared_transform_annotation_list($xml_in, $input_type) {
 }
 
 /**
- * Gets individual annotation pids from resource index
- * called with islandora/anno/get_urns
+ * Gets individual annotation pids from RI.
+ *
+ * Called with islandora/anno/get_urns.
+ *
  * @global url $base_url
- * @param array $pids
+ *
+ * @param array $pid
+ *   An array of pids.
  */
 function islandora_shared_get_annotation_pids($pid) {
 
@@ -209,21 +228,6 @@ function islandora_shared_get_annotation_pids($pid) {
 	ORDER BY ASC(?type)
 QUERY;
 
-  /*  $query = <<<QUERY
-    PREFIX io: <http://islandora.ca/ontology/relsext#>
-    PREFIX fm: <info:fedora/fedora-system:def/model#>
-
-
-    SELECT ?id ?type ?urn from <#ri>
-    WHERE {
-    ?id io:targets <info:fedora/$pid> ;
-    io:hasURN ?urn;
-    io:isAnnotationType ?type;
-    fm:state fm:Active ;
-    }
-    ORDER BY ASC(?type)
-    QUERY; */
-
   $item = islandora_object_load($pid);
   $objects = $item->repository->ri->sparqlQuery($query);
 
@@ -245,15 +249,18 @@ QUERY;
 }
 
 /**
- * Retrieves details of individual annotation from datastream
+ * Retrieves details of individual annotation from datastream.
+ *
  * @global url $base_url
+ *
  * @param string $pid
- * 
- * @return IslandoraRdfBuilder
+ *   A pid of an object.
+ *
+ * @return XML
+ *   The XML content of the OAC datastream.
  */
 function islandora_get_annotation_data($pid) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  global $base_url;
   $item = islandora_object_load($pid);
   if (!isset($item)) {
     return;
@@ -263,11 +270,15 @@ function islandora_get_annotation_data($pid) {
 }
 
 /**
- * Retrieves transforms annotation data for the editor
- * Called with /islandora/anno/get_annotation/
- * Doctype declarations are removed
+ * Retrieves transforms annotation data for the editor.
+ *
+ * Called with /islandora/anno/get_annotation/.
+ *
  * @param string $pid
+ *   The pid of an object
+ *
  * @param urn $urn
+ *   Urn.
  */
 function islandora_shared_get_annotation($pid, $urn = NULL) {
   if (isset($urn)) {
@@ -275,6 +286,7 @@ function islandora_shared_get_annotation($pid, $urn = NULL) {
   }
   $xml = islandora_get_annotation_data($pid);
   $results = islandora_shared_transform_annotation_list($xml, 'rdf');
+  // Remove the doc type declarations.
   $results = preg_replace('/<\?xml.*?\?>/', '', $results);
   $results = preg_replace('/<!DOCTYPE.*?>/', '', $results);
 
@@ -282,32 +294,48 @@ function islandora_shared_get_annotation($pid, $urn = NULL) {
 }
 
 /**
+ * Deletes an annotation object.
  *
-
  * @param string $pid
+ *   The pid of an object.
+ *
  * @param urn $urn
+ *   Urn.
  */
 function islandora_delete_annotation($pid, $urn) {
-  // module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $pid_to_delete = islandora_canvas_get_pid_from_urn($urn);
   $item = islandora_object_load($pid_to_delete);
   $item->repository->purgeObject($item->id);
 }
 
 /**
- * Persists new annotations
+ * Persists new annotations.
+ *
  * @global url $base_url
- * @param <type> $pid
- * @param <type> $rdf
+ *
+ * @param string $pid
+ *   The pid of an object.
+ *
+ * @param RDF $rdf
+ *   An IslandoraRdfBuilder object.
  */
 function islandora_save_updated_annotations($pid, $rdf) {
-  global $base_url;
-  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $item = islandora_object_load($pid);
   $updated_annotation_list = $rdf->printRDF();
   $item['AnnotationList']->content = $updated_annotation_list;
 }
 
+/**
+ * Builds an annotation list.
+ *
+ * @global url $base_url
+ *
+ * @param string $pid
+ *   The pid of an object.
+ *
+ * @return RDF
+ *   An IslandoraRdfBuilder object.
+ */
 function build_annotation_list($pid) {
   global $base_url;
   $doc_url = "$base_url/islandora/object/$pid";
@@ -342,9 +370,13 @@ function build_annotation_list($pid) {
 }
 
 /**
- * Gets the pid of an annotation object identified by a know urn
+ * Gets the pid of an annotation object identified by a know urn.
+ *
  * @param URN $urn
- * @return PID
+ *   A urn.
+ *
+ * @return string
+ *   The pid retrived from an urn.
  */
 function islandora_canvas_get_pid_from_urn($urn) {
   global $user;
@@ -360,27 +392,26 @@ and \$urn <mulgara:is> 'urn:uuid:$urn'";
 }
 
 /**
- * Updates existing annotation
+ * Updates existing annotation.
+ *
  * Called by Shared Canvas with ajax
  */
 function islandora_canvas_update_annotation() {
-  //module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $changed = FALSE;
-  //retrieve variables from POST
+  // Retrieve variables from POST.
   $urn = urldecode($_POST['urn']);
   $title = urldecode($_POST['title']);
   $content = urldecode($_POST['content']);
   $type = urldecode($_POST['annoType']);
   $new_color = urldecode($_POST['color']);
   $new_stroke_width = urldecode($_POST['strokeWidth']);
-  //$annotation_xml = islandora_shared_transform_annotation_list(urldecode($_POST['rdfData']), 'html');
   $pid = islandora_canvas_get_pid_from_urn($urn);
   $fedora_object = islandora_object_load($pid);
 
   $annotation = $fedora_object['OAC']->content;
   $xml = simplexml_load_string($annotation);
 
-  //indentify URN of body to retrieve chars node to hold new annotation content
+  // Identify URN of body to retrieve chars node to hold new annotation content.
   $body_urn_array = $xml->xpath("//oa:hasBody");
   $body_urn = (string) $body_urn_array[0]->attributes('rdf', 'about');
   $content_node = $xml->xpath("//rdf:Description[@rdf:about = '$body_urn']//cnt:chars");
@@ -390,7 +421,7 @@ function islandora_canvas_update_annotation() {
   $target_node = $xml->xpath("//rdf:Description[@rdf:about = '$constrained_by_urn']//cnt:chars");
   $target_value = (string) $target_node[0];
 
-  //if color picking is allowed, update here
+  // If color picking is allowed, update here.
   if (!$optimized = variable_get('islandora_annotation_optimized', TRUE)) {
     $rels = $fedora_object->relationships->get(ISLANDORA_RELS_EXT_URI, 'hasColor');
     $old_color = (!empty($rels)) ? $rels[0]['object']['value'] : '';
@@ -412,7 +443,7 @@ function islandora_canvas_update_annotation() {
     $changed = TRUE;
   }
 
-  //update the rels if the category has changed
+  // Update the RELS if the category has changed.
   $anno_type = $fedora_object->relationships->get(ISLANDORA_RELS_EXT_URI, 'isAnnotationType');
   if (!empty($anno_type) && array_key_exists('object', $anno_type) && array_key_exists('value', $anno_type['object'])) {
     $anno_type_value = $anno_type['object']['value'];
@@ -422,8 +453,7 @@ function islandora_canvas_update_annotation() {
     }
   }
 
-
-  // identify Title element and replace content
+  // Identify Title element and replace content.
   $title_node = $xml->xpath("//rdf:Description[@rdf:about = 'urn:uuid:$urn']/dc:title");
   if ($title_node[0][0] != $title) {
     $title_node[0][0] = $title;
@@ -441,14 +471,19 @@ function islandora_canvas_update_annotation() {
     $changed = TRUE;
   }
 
-
-  // persist updated annotation
+  // Persist updated annotation.
   if ($changed) {
     $test_xml = $xml->asXML();
     $fedora_object['OAC']->content = $xml->asXML();
   }
 }
 
+/**
+ * Get type terms via solr.
+ *
+ * @return array
+ *   Keys of the terms returned from solr.
+ */
 function islandora_annotations_get_type_terms() {
   $type_field = variable_get('annotation_type_search_field', 'anno_category_s');
   $solr = variable_get('islandora_solr_url', 'localhost:8080/solr');
@@ -465,12 +500,12 @@ function islandora_annotations_get_type_terms() {
 }
 
 /**
- * return each solr doc found
- * 
+ * Return each solr doc found.
+ *
  * @type string
- *   the type to search for
+ *   The type to search for.
  * @return string
- *   json string
+ *   JSON string.
  */
 function islandora_annotations_get_title_terms($type) {
   $title_field = variable_get('annotation_title_search_field', 'mads_titles_sv');
@@ -478,19 +513,22 @@ function islandora_annotations_get_title_terms($type) {
   $url = "http://$solr/select/?q=mads_genre_it:$type&version=2.2&start=0&rows=1000&indent=on&fl=$title_field,PID&wt=json&sort=$title_field%20asc";
   $results = json_decode(file_get_contents($url), TRUE);
   $docs = $results['response']['docs'];
-  //asort($docs);
   echo json_encode($docs);
   exit();
 }
 
 
 /**
- * Currently this reads the the MADS data stream and returns content that will 
- * populate an annotation, this is specific to UPEI VDP project.
- * TODO: call module invoke all here and move this function out to be implemented 
- * by a submodule, this way other modules could control the population of an anno body
- * from a controlled vocabulary.  As is this function has no real affect on anything except
- * instances where both the Title and Type are determined from a controlled vocabulary.
+ * Reads MADS data stream and returns content to populate an annotation.
+ *
+ * This is specific to UPEI VDP project.
+ *
+ * @TODO: call module invoke all here and move this function out to be
+ * implemented by a submodule, this way other modules could control the
+ * population of an anno body * from a controlled vocabulary.  As is this
+ * function has no real affect on anything except instances where both the Title
+ * and Type are determined from a controlled vocabulary.
+ *
  * @param string $pid
  *   the identifier of the object to read the datatstream from
  */
@@ -512,10 +550,8 @@ function islandora_annotations_get_mads_as_json($pid) {
       $str = ucfirst(trim($attr));
       $str = str_replace('_', ' ', $str);
       $arr[$str] = trim($element->nodeValue);
-      //$str .= $attr .': '. trim($element->nodeValue). '<br />';
     }
   }
   echo json_encode($arr);
-  //echo $str;
   exit();
 }

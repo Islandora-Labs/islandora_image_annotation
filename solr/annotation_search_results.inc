@@ -2,46 +2,50 @@
 
 /**
  * @file
- * Class override for grid display in solr search results
+ * Class override for grid display in solr search results.
  */
 
 /**
- * Extention of IslandoraSolrResults to create an alternative display type.  This
- * display is designed for the VDP project at UPEI and assumes certain fields.
+ * Extention of IslandoraSolrResults to create an alternative display type.
+ *
+ * This display is designed for the VDP project at UPEI and assumes
+ * certain fields.
  */
 class IslandoraSolrResultsAnno extends IslandoraSolrResults {
 
   /**
-   * Renders the primary or secondary display profile based on the raw Solr
-   * results. This is the method most Islandora Solr display plugins would
-   * override.
+   * Renders the primary or secondary display profile based on the Solr results.
    *
-   * @param type $results
+   * This is the method most Islandora Solr display plugins would override.
+   *
+   * @param array $results
    *   The raw Solr results from IslandoraSolrQueryProcessor::solrResult
-   * @return
+   *
+   * @return markup
    *   Rendered Solr results
    *
    * @see IslandoraSolrResults::displayResults()
    */
   function printResults($results) {
 
-    // set variables
+    // Set variables.
     $results_array = array();
     $elements = array();
 
-    // total
+    // Total.
     $elements['solr_total'] = $results->response->numFound;
 
-    // start
+    // Start.
     $elements['solr_start'] = $results->response->start;
 
-    // get prepared search results
+    // Get prepared search results.
     $docs = $this->prep_results($results);
 
-    // optionally limit results to values given
+    // Optionally limit results to values given.
     $limitResults = variable_get('islandora_solr_limit_result_fields', 0);
-    // we will honor the limit results for display but we need some fields 
-    // like PID and content model, the content model so we can determine what object to link to
+    // We will honor the limit results for display but we need some fields
+    // like PID and content model, the content model so we can determine what
+    // object to link to.
     $key_fields = array();
 
     // loop over results array
@@ -104,13 +108,13 @@ class IslandoraSolrResultsAnno extends IslandoraSolrResults {
 
   /**
    * key_fileds are feilds used for logic but not display
-   * in the solr clienn users can specify what fields to return, if they don't 
+   * in the solr clienn users can specify what fields to return, if they don't
    * specify PID or cModel we can't use them in links or for logic.  We add them
-   * to a key_fields array in case the user doesn't want them displayed.  These 
+   * to a key_fields array in case the user doesn't want them displayed.  These
    * probably should be single valued fields
    * @param array $key_fields
    * @param string $field
-   * @param array $doc 
+   * @param array $doc
    */
   function add_key_field(&$key_fields, $field, $doc) {
     if (isset($doc[$field])) {
