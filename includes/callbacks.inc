@@ -119,38 +119,8 @@ function islandora_add_annotation($pid) {
   $new_ds->mimetype = 'text/xml';
   $new_ds->content = $annotation_xml;
   $item->ingestDatastream($new_ds);
-
-  $item->repository->ingestObject($item);
-  // @TODO: reimplement this when islandora 7 refactoring is done
-  //foreach (islandora_build_hook_list(ISLANDORA_POST_INGEST_HOOK, $item->models) as $hook) {
-  //  module_invoke_all($hook, $item);
-  //}
+  islandora_add_object($item);
   echo $item->id;
-}
-
-/**
- * Adds the object to the repository and calls hooks.
- *
- * @TODO Replace with islandora_add_object and Tuque wrapper hooks?
- *
- * @param FedoraObject $object
- *   A FedoraObject.
- *
- * @return FedoraObject
- *   A FedoraObject.
- */
-function islandora_ingest_add_object(&$object) {
-  drupal_alter('islandora_pre_ingest', $object);
-
-  $object->repository->ingestObject($object);
-
-  module_load_include('inc', 'islandora', 'includes/utilities');
-
-  foreach (islandora_build_hook_list(ISLANDORA_POST_INGEST_HOOK, $object->models) as $hook) {
-    module_invoke_all($hook, $object);
-  }
-
-  return $object;
 }
 
 /**
@@ -228,8 +198,8 @@ function islandora_shared_get_annotation_pids($pid) {
 	ORDER BY ASC(?type)
 QUERY;
 
-  $item = islandora_object_load($pid);
-  $objects = $item->repository->ri->sparqlQuery($query);
+  $connection = islandora_get_tuque_connection();
+  $objects = $connection->repository->ri->sparqlQuery($query);
 
   foreach ($objects as $object) {
     $itemdata = array(
@@ -305,7 +275,7 @@ function islandora_shared_get_annotation($pid, $urn = NULL) {
 function islandora_delete_annotation($pid, $urn) {
   $pid_to_delete = islandora_canvas_get_pid_from_urn($urn);
   $item = islandora_object_load($pid_to_delete);
-  $item->repository->purgeObject($item->id);
+  islandora_delete_object($item);
 }
 
 /**
@@ -379,9 +349,8 @@ function build_annotation_list($pid) {
  *   The pid retrived from an urn.
  */
 function islandora_canvas_get_pid_from_urn($urn) {
-  global $user;
   module_load_include('inc', 'islandora', 'includes/tuque');
-  $connection = new IslandoraTuque($user);
+  $connection = islandora_get_tuque_connection();
   $query = "select \$id  from <#ri> where \$id <http://islandora.ca/ontology/relsext#hasURN> \$urn
 and \$urn <mulgara:is> 'urn:uuid:$urn'";
 
@@ -486,12 +455,16 @@ function islandora_canvas_update_annotation() {
  */
 function islandora_annotations_get_type_terms() {
   $type_field = variable_get('annotation_type_search_field', 'anno_category_s');
-  $solr = variable_get('islandora_solr_url', 'localhost:8080/solr');
-  $url = "http://$solr/select?indent=on&version=2.2&q=rels.hasModel:islandora\:OACCModel&fl=$type_field&fq=&start=0&rows=10000&fl=PID&qt=standard&wt=json";
-  $results = json_decode(file_get_contents($url), TRUE);
-  $docs = $results['response']['docs'];
+  $query = 'rels.hasModel:"islandora:OACCmodel"';
+  $params = array(
+    'fl' => "$type_field, PID",
+    'start' => '0',
+    'rows' => '10000',
+    'qt' => variable_get('islandora_solr_request_handler', ''),
+  );
+  $results = islandora_annotations_query_solr($query, $params);
   $terms = array();
-  foreach ($docs as $doc) {
+  foreach ($results['solr_doc'] as $doc) {
     if (array_key_exists($type_field, $doc)) {
       $terms[$doc[$type_field][0]] = 1;
     }
@@ -510,8 +483,18 @@ function islandora_annotations_get_type_terms() {
 function islandora_annotations_get_title_terms($type) {
   $title_field = variable_get('annotation_title_search_field', 'mads_titles_sv');
   $solr = variable_get('islandora_solr_url', 'localhost:8080/solr');
-  $url = "http://$solr/select/?q=mads_genre_it:$type&version=2.2&start=0&rows=1000&indent=on&fl=$title_field,PID&wt=json&sort=$title_field%20asc";
-  $results = json_decode(file_get_contents($url), TRUE);
+  $data = array(
+    'q' => 'mads_genre_it:"' . $type . '"',
+    'fl' => "$title_field, PID",
+    'start' => '0',
+    'rows' => '10000',
+    'wt' => 'json',
+    'qt' => variable_get('islandora_solr_request_handler', 'standard'),
+    'sort' => "$title_field asc",
+  );
+  $solr_url = url($solr . '/select', array('query' => $data));
+  $result_request = drupal_http_request($solr_url);
+  $results = json_decode($result_request->data, TRUE);
   $docs = $results['response']['docs'];
   echo json_encode($docs);
   exit();
@@ -554,4 +537,32 @@ function islandora_annotations_get_mads_as_json($pid) {
   }
   echo json_encode($arr);
   exit();
+}
+
+/**
+ * Helper function to query solr.
+ *
+ * @param string $query
+ *   A query string.
+ *
+ * @param array $params
+ *   An associate array containing solr params.
+ */
+function islandora_annotations_query_solr($query, $params) {
+  $query_processor = new IslandoraSolrQueryProcessor();
+  $query_processor->solrQuery = $query;
+  foreach ($params as $field => $value) {
+    if ($field == 'start') {
+      $query_processor->solrStart = $value;
+    }
+    elseif ($field == 'rows') {
+      $query_processor->solrLimit = $value;
+    }
+    else {
+      $query_processor->solrParams[$field] = $value;
+    }
+  }
+  $query_processor->executeQuery(FALSE);
+  $results = $query_processor->islandoraSolrResult;
+  return $results;
 }

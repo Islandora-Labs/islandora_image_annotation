@@ -136,7 +136,6 @@ function islandora_image_annotation_access($fedora_object) {
     return FALSE;
   }
 
-  $models = $fedora_object->models;
   $cmodel_list = variable_get('islandora_annotation_mappings');
   foreach ($fedora_object->models as $model) {
     if (isset($cmodel_list[$model])) {
