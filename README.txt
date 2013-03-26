@@ -1,20 +1,17 @@
+CONTENTS OF THIS FILE
+---------------------
+
+ * summary
+ * configuration
+ * customization
+ * faq
+ 
 SUMMARY
 -------
 
 Adds the ability to add annotations to images.  This solution pack piggy backs
 on top of other Islandora Solution Packs such as basic_image and large_image by 
 adding a new tab to existing views.  This tab includes the annotation tools.
-
-
-REQUIREMENTS
-------------
-
-INSTALLATION
-------------
-
-Google Analytics tracking should be setup independent of this reporting aspect. A Google Analytics module is available for tracking
-(http://www.drupal.org/project/google_analytics).
-
 
 CONFIGURATION
 -------------
@@ -42,9 +39,6 @@ have to update them as well.
 
 If you have solr configured properly and have Annotation Categories set as user 
 defined you will have a type ahead for the Annotations categories section.
-
-TROUBLESHOOTING
----------------
 
 
 F.A.Q.
