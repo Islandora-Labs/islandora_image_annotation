@@ -48,7 +48,7 @@ function islandora_canvas_setup($pid) {
   $pages[1] = $pid;
   $position = array_search($pid, $pages);
   $results = array();
-  $results['manifest_url'] = url("islandora/anno/serve/$pid/Manifest/manifest.xml");
+  $results['manifest_url'] = rawurldecode(url("islandora/anno/serve/$pid/Manifest/manifest.xml", array('absolute' => TRUE)));
   $results['page_title'] = $item->label;
   $results['object_base'] = url("islandora/object/$pid");
   $results['islandora_post_url'] = url("islandora/anno/add_annotation/$pid");
