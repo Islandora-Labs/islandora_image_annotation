@@ -10,13 +10,14 @@
  *
  * Supplies the basic data, including maifest uri
  *
- * @global url $base_url
+ * @global string $base_path
+ * @global object $user
  *
  * @param string $pid
  *   The pid of a object.
  */
 function islandora_canvas_setup($pid) {
-  global $base_url;
+  global $base_path;
   global $user;
 
   module_load_include('inc', 'islandora_image_annotation', 'includes/rdf_builder');
@@ -41,21 +42,21 @@ function islandora_canvas_setup($pid) {
     $categories = islandora_annotations_get_type_terms();
   }
 
-  $image_url = "$base_url/islandora/object/$pid/datastream/$dsid";
+  $image_url = url("islandora/object/$pid/datastream/$dsid");
   $title = $item->label;
   $pages = array();
   $pages[1] = $pid;
   $position = array_search($pid, $pages);
   $results = array();
-  $results['manifest_url'] = "$base_url/islandora/anno/serve/$pid/Manifest/manifest.xml";
+  $results['manifest_url'] = rawurldecode(url("islandora/anno/serve/$pid/Manifest/manifest.xml", array('absolute' => TRUE)));
   $results['page_title'] = $item->label;
-  $results['object_base'] = "$base_url/islandora/object/$pid";
-  $results['islandora_post_url'] = "$base_url/islandora/anno/add_annotation/$pid";
-  $results['islandora_get_annotation'] = "$base_url/islandora/anno/get_annotation/";
-  $results['islandora_delete_annotation'] = "$base_url/islandora/anno/delete_annotation/$pid/";
-  $results['get_annotation_list_url'] = "$base_url/islandora/anno/get_urns/$pid";
-  $results['islandora_update_annotation'] = "$base_url/islandora/anno/update_annotation/";
-  $results['islandora_base_url'] = "$base_url/";
+  $results['object_base'] = url("islandora/object/$pid");
+  $results['islandora_post_url'] = url("islandora/anno/add_annotation/$pid");
+  $results['islandora_get_annotation'] = url("islandora/anno/get_annotation/");
+  $results['islandora_delete_annotation'] = url("islandora/anno/delete_annotation/$pid/");
+  $results['get_annotation_list_url'] = url("islandora/anno/get_urns/$pid");
+  $results['islandora_update_annotation'] = url("islandora/anno/update_annotation/");
+  $results['islandora_base_url'] = "$base_path";
   $results['islandora_anno_use_title_vocab'] = variable_get('annotation_use_title_vocabulary', FALSE);
   $results['islandora_anno_stroke_width'] = $stroke_width;
   $results['islandora_anno_stroke_widths'] = variable_get('annotation_stroke_widths', '.3 .6. .9  1.2 1.5');
@@ -73,14 +74,11 @@ function islandora_canvas_setup($pid) {
 /**
  * Creates annotation objects from html supplied by Shared Canvas.
  *
- * @global url $base_url
- *
  * @param string $pid
  *   The pid of a object.
  */
 function islandora_add_annotation($pid) {
   global $user;
-  global $base_url;
   module_load_include('inc', 'islandora', 'includes/utilities');
   $data = $_POST['data'];
   $stroke_width = $_POST['strokeWidth'];
@@ -119,38 +117,8 @@ function islandora_add_annotation($pid) {
   $new_ds->mimetype = 'text/xml';
   $new_ds->content = $annotation_xml;
   $item->ingestDatastream($new_ds);
-
-  $item->repository->ingestObject($item);
-  // @TODO: reimplement this when islandora 7 refactoring is done
-  //foreach (islandora_build_hook_list(ISLANDORA_POST_INGEST_HOOK, $item->models) as $hook) {
-  //  module_invoke_all($hook, $item);
-  //}
+  islandora_add_object($item);
   echo $item->id;
-}
-
-/**
- * Adds the object to the repository and calls hooks.
- *
- * @TODO Replace with islandora_add_object and Tuque wrapper hooks?
- *
- * @param FedoraObject $object
- *   A FedoraObject.
- *
- * @return FedoraObject
- *   A FedoraObject.
- */
-function islandora_ingest_add_object(&$object) {
-  drupal_alter('islandora_pre_ingest', $object);
-
-  $object->repository->ingestObject($object);
-
-  module_load_include('inc', 'islandora', 'includes/utilities');
-
-  foreach (islandora_build_hook_list(ISLANDORA_POST_INGEST_HOOK, $object->models) as $hook) {
-    module_invoke_all($hook, $object);
-  }
-
-  return $object;
 }
 
 /**
@@ -197,8 +165,6 @@ function islandora_shared_transform_annotation_list($xml_in, $input_type) {
  *
  * Called with islandora/anno/get_urns.
  *
- * @global url $base_url
- *
  * @param array $pid
  *   An array of pids.
  */
@@ -228,8 +194,8 @@ function islandora_shared_get_annotation_pids($pid) {
 	ORDER BY ASC(?type)
 QUERY;
 
-  $item = islandora_object_load($pid);
-  $objects = $item->repository->ri->sparqlQuery($query);
+  $connection = islandora_get_tuque_connection();
+  $objects = $connection->repository->ri->sparqlQuery($query);
 
   foreach ($objects as $object) {
     $itemdata = array(
@@ -250,8 +216,6 @@ QUERY;
 
 /**
  * Retrieves details of individual annotation from datastream.
- *
- * @global url $base_url
  *
  * @param string $pid
  *   A pid of an object.
@@ -305,7 +269,7 @@ function islandora_shared_get_annotation($pid, $urn = NULL) {
 function islandora_delete_annotation($pid, $urn) {
   $pid_to_delete = islandora_canvas_get_pid_from_urn($urn);
   $item = islandora_object_load($pid_to_delete);
-  $item->repository->purgeObject($item->id);
+  islandora_delete_object($item);
 }
 
 /**
@@ -326,50 +290,6 @@ function islandora_save_updated_annotations($pid, $rdf) {
 }
 
 /**
- * Builds an annotation list.
- *
- * @global url $base_url
- *
- * @param string $pid
- *   The pid of an object.
- *
- * @return RDF
- *   An IslandoraRdfBuilder object.
- */
-function build_annotation_list($pid) {
-  global $base_url;
-  $doc_url = "$base_url/islandora/object/$pid";
-  $doc_path_url = "$base_url/islandora/anno/serve/$pid";
-  $item = islandora_object_load($pid);
-
-  $annotation_list = get_annotation_list($doc_url, $doc_path_url);
-  $dom_doc = new DOMDocument();
-  $dom_doc->formatOutput = TRUE;
-  $dom_doc->loadXML($annotation_list);
-  $rdf = new IslandoraRdfBuilder($dom_doc);
-
-  if (isset($item['AnnotationList'])) {
-    $list = $item['AnnotationList']->content;
-    if (strlen($list) < 50) {
-      return;
-    }
-    $anno_doc = new DOMDocument();
-    $anno_doc->loadXML($list);
-    $descriptions = $anno_doc->getElementsByTagName('Description');
-    foreach ($descriptions as $description) {
-      $constrains = $description->getElementsByTagName('constrains');
-      foreach ($constrains as $candidate) {
-        $candidate->setAttribute("rdf:resource", "$base_url/fedora/repository/$pid/Canvas");
-      }
-      $new_node = $dom_doc->importNode($description, TRUE);
-      $rdf->root->appendChild($new_node);
-    }
-  }
-
-  return $rdf;
-}
-
-/**
  * Gets the pid of an annotation object identified by a know urn.
  *
  * @param URN $urn
@@ -379,9 +299,8 @@ function build_annotation_list($pid) {
  *   The pid retrived from an urn.
  */
 function islandora_canvas_get_pid_from_urn($urn) {
-  global $user;
   module_load_include('inc', 'islandora', 'includes/tuque');
-  $connection = new IslandoraTuque($user);
+  $connection = islandora_get_tuque_connection();
   $query = "select \$id  from <#ri> where \$id <http://islandora.ca/ontology/relsext#hasURN> \$urn
 and \$urn <mulgara:is> 'urn:uuid:$urn'";
 
@@ -486,12 +405,21 @@ function islandora_canvas_update_annotation() {
  */
 function islandora_annotations_get_type_terms() {
   $type_field = variable_get('annotation_type_search_field', 'anno_category_s');
-  $solr = variable_get('islandora_solr_url', 'localhost:8080/solr');
-  $url = "http://$solr/select?indent=on&version=2.2&q=rels.hasModel:islandora\:OACCModel&fl=$type_field&fq=&start=0&rows=10000&fl=PID&qt=standard&wt=json";
-  $results = json_decode(file_get_contents($url), TRUE);
-  $docs = $results['response']['docs'];
+  $query = format_string('!field:("!content_model" OR "info:fedora/!content_model")', array(
+    '!field' => variable_get('islandora_solr_content_model_field', 'RELS_EXT_hasModel_uri_ms'),
+    '!content_model' => 'islandora:OACCmodel',
+  ));
+
+  $params = array(
+    'fl' => "$type_field, PID",
+    'start' => '0',
+    'rows' => '10000',
+    'qt' => variable_get('islandora_solr_request_handler', ''),
+  );
+
+  $results = islandora_annotations_query_solr($query, $params);
   $terms = array();
-  foreach ($docs as $doc) {
+  foreach ($results['solr_doc'] as $doc) {
     if (array_key_exists($type_field, $doc)) {
       $terms[$doc[$type_field][0]] = 1;
     }
@@ -510,8 +438,21 @@ function islandora_annotations_get_type_terms() {
 function islandora_annotations_get_title_terms($type) {
   $title_field = variable_get('annotation_title_search_field', 'mads_titles_sv');
   $solr = variable_get('islandora_solr_url', 'localhost:8080/solr');
-  $url = "http://$solr/select/?q=mads_genre_it:$type&version=2.2&start=0&rows=1000&indent=on&fl=$title_field,PID&wt=json&sort=$title_field%20asc";
-  $results = json_decode(file_get_contents($url), TRUE);
+  $data = array(
+    'q' => format_string('!field:"!value"', array(
+      '!field' => variable_get('annotation_genre_field', 'mads_genre_it'),
+      '!value' => $type,
+    )),
+    'fl' => "$title_field, PID",
+    'start' => '0',
+    'rows' => '10000',
+    'wt' => 'json',
+    'qt' => variable_get('islandora_solr_request_handler', 'standard'),
+    'sort' => "$title_field asc",
+  );
+  $solr_url = url($solr . '/select', array('query' => $data));
+  $result_request = drupal_http_request($solr_url);
+  $results = json_decode($result_request->data, TRUE);
   $docs = $results['response']['docs'];
   echo json_encode($docs);
   exit();
@@ -554,4 +495,32 @@ function islandora_annotations_get_mads_as_json($pid) {
   }
   echo json_encode($arr);
   exit();
+}
+
+/**
+ * Helper function to query solr.
+ *
+ * @param string $query
+ *   A query string.
+ *
+ * @param array $params
+ *   An associate array containing solr params.
+ */
+function islandora_annotations_query_solr($query, $params) {
+  $query_processor = new IslandoraSolrQueryProcessor();
+  $query_processor->solrQuery = $query;
+  foreach ($params as $field => $value) {
+    if ($field == 'start') {
+      $query_processor->solrStart = $value;
+    }
+    elseif ($field == 'rows') {
+      $query_processor->solrLimit = $value;
+    }
+    else {
+      $query_processor->solrParams[$field] = $value;
+    }
+  }
+  $query_processor->executeQuery(FALSE);
+  $results = $query_processor->islandoraSolrResult;
+  return $results;
 }

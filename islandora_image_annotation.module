@@ -92,7 +92,7 @@ function islandora_image_annotation_menu() {
     'file' => 'includes/callbacks.inc',
   );
 
-  $items['islandora/object/%islandora_object/view/annotation'] = array(
+  $items['islandora/object/%islandora_object/annotation'] = array(
     'title' => 'Image Annotation',
     'page callback' => 'islandora_image_annotation_view',
     'page arguments' => array(2),
@@ -136,7 +136,6 @@ function islandora_image_annotation_access($fedora_object) {
     return FALSE;
   }
 
-  $models = $fedora_object->models;
   $cmodel_list = variable_get('islandora_annotation_mappings');
   foreach ($fedora_object->models as $model) {
     if (isset($cmodel_list[$model])) {
@@ -157,14 +156,6 @@ function islandora_image_annotation_theme($existing, $type, $theme, $path) {
     ),
     'islandora_annotation_table' => array(
       'render element' => 'form',
-    ),
-    'islandora_image_annotation_solr' => array(
-      'template' => 'theme/islandora-image-annotation-solr',
-      'variables' => array(
-        'results' => NULL,
-        'elements' => array(),
-        'key_fields' => array(),
-      ),
     ),
   );
 }
@@ -200,91 +191,12 @@ function islandora_image_annotation_preprocess_islandora_image_annotation_view(&
   $variables['islandora_image_annotation_src'] = $src;
   $variables['islandora_image_annotation_pid'] = $pid;
 
+  drupal_add_css($path . '/css/islandora_annotation.css');
+
   drupal_add_js($path . '/shared_canvas/js/window_behaviours.js');
 
   // Add css.
   drupal_add_css($path . '/shared_canvas/css/window_behaviours.css');
-}
-
-/**
- * Adds the image annotation display to the primary displays list in solr.
- *
- * @return array
- *   Array defining the image annotation search results.
- */
-function islandora_image_annotation_islandora_solr_primary_display() {
-  return array(
-    'annotation' => array(
-      'name' => t('Annotation'),
-      'module' => 'islandora_image_annotation',
-      'file' => 'solr/annotation_search_results.inc',
-      'class' => "IslandoraSolrResultsAnno",
-      'function' => "displayResults",
-      'description' => t("Search results for annotations, annotations provide links to their parent objects"),
-    ),
-  );
-}
-
-/**
- * Hook_preprocess function.
- *
- * @global type $base_url
- *
- * @global type $base_path
- *
- * @param array $variables
- *   An associative array containing:
- *   - results: array of returned Solr documents.
- *   - elements: (optional) additional elements to include in the template file.
- *   - key_fields: fields that need in urls. Add them here in case users remove
- *     them in the solr client config section (PID, rels.hasModel, PARENT_pid).
- */
-function islandora_image_annotation_preprocess_islandora_image_annotation_solr(&$variables) {
-  global $base_url;
-  global $base_path;
-
-  $variables['base_url'] = $base_url;
-
-  $variables['base_path'] = $base_path;
-
-  $path = $base_path . drupal_get_path('module', 'islandora_solr');
-
-  $solr_default_img = $path . '/images/defaultimg.png';
-  $variables['elements']['solr_default_img'] = $solr_default_img;
-
-  // Make all variables in 'elements' available as variables in the template
-  // file.
-  foreach ($variables['elements'] as $key => $value) {
-    $variables[$key] = $value;
-  }
-
-  foreach ($variables['results'] as $key => $value) {
-    $object = islandora_object_load($value['PID']['value']);
-    // We may want to return to the parent not the object.
-    $variables['pid_for_url'][$key] = $value['PID']['value'];
-    $pid = $value['PID']['value'];
-    if (isset($variables['key_fields']['rels.hasModel'][$pid]) && $variables['key_fields']['rels.hasModel'][$pid] == 'info:fedora/islandora:OACCModel') {
-      // Create link to parent object.
-      $variables['pid_for_url'][$key] = $variables['key_fields']['PARENT_pid'][$pid] . '/view/annotation';
-      $variables['anno_category'][$key] = isset($value['anno_category_s']['value']) ? $value['anno_category_s']['value'] : '';
-      $variables['anno_title'][$key] = isset($value['anno_title_s']['value']) ? $value['anno_title_s']['value'] : '';
-      $variables['anno_body'][$key] = isset($value['anno_body_t']['value']) ? $value['anno_body_t']['value'] : '';
-      $variables['thumbnail_path'][$key] = url('islandora/object/' . $variables['key_fields']['PARENT_pid'][$pid] . '/datastream/TN');
-      // We want to link to the parent object.
-      $variables['results'][$key]['PID']['value'] = $variables['key_fields']['PARENT_pid'][$pid];
-      $variables['results'][$key]['Anno_ID'] = array(
-        'value' => $pid,
-        'label' => 'Annotation ID',
-        'class' => 'anno-id',
-      );
-    }
-    elseif (isset($object['TN'])) {
-      $variables['thumbnail_path'][$key] = url('islandora/object/' . $pid . '/datastream/TN');
-    }
-    else {
-      $variables['thumbnail_path'][$key] = $path . '/images/defaultimg.png';
-    }
-  }
 }
 
 /**
