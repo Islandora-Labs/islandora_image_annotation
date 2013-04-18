@@ -13,7 +13,7 @@
  * @param string $pid
  *   Pid of the object.
  */
-function build_manifest($pid) {
+function islandora_image_annotation_build_manifest($pid) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
   $dsid = islandora_image_annotation_get_dsid_from_model($pid);
   global $base_url;
@@ -24,14 +24,14 @@ function build_manifest($pid) {
   $doc_url = "$base_url/islandora/object/$pid/datastream/$dsid/view/";
   // XML datastreams used by Shared Canvas must be echoed though ajax.
   $doc_path_url = "$base_url/islandora/anno/serve/$pid";
-  $dimensions = get_height_and_width($pid);
+  $dimensions = islandora_image_annotation_get_height_and_width($pid);
 
   $height = $dimensions['height'];
   $width = $dimensions['width'];
-  $file_array['Manifest'] = get_manifest($doc_url, $doc_path_url);
-  $file_array['ImageAnnotations'] = get_image_annotations($doc_url, $doc_path_url, $height, $width, $title);
-  $file_array['NormalSequence'] = get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width);
-  $file_array['AnnotationList'] = get_annotationList($doc_url, $doc_path_url);
+  $file_array['Manifest'] = islandora_image_annotation_get_manifest($doc_url, $doc_path_url);
+  $file_array['ImageAnnotations'] = islandora_image_annotation_get_image_annotations($doc_url, $doc_path_url, $height, $width, $title);
+  $file_array['NormalSequence'] = islandora_image_annotation_get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width);
+  $file_array['AnnotationList'] = islandora_image_annotation_get_annotation_list($doc_url, $doc_path_url);
   $flat_pid = str_replace(':', '_', $pid);
   $file_path = file_directory_path() . "/$flat_pid/manifest";
   if (!is_dir($file_path)) {
@@ -57,64 +57,64 @@ function build_manifest($pid) {
  * @return XML
  *   XML generated in the RDF builder.
  */
-function get_manifest($doc_url, $doc_path_url) {
+function islandora_image_annotation_get_manifest($doc_url, $doc_path_url) {
   $timestamp = date(DATE_W3C);
   module_load_include('inc', 'islandora_image_annotation', 'includes/rdf_builder');
   $rdf = new IslandoraRdfBuilder();
 
   $name = "$doc_url/Manifest";
   $children = array();
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/Manifest'));
-  $children[] = $rdf->build_child('ore:aggregates', array('rdf:resource' => "$doc_url/NormalSequence"));
-  $children[] = $rdf->build_child('ore:aggregates', array('rdf:resource' => "$doc_url/AnnotationList"));
-  $children[] = $rdf->build_child('ore:aggregates', array('rdf:resource' => "$doc_url/ImageAnnotations"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/Manifest'));
+  $children[] = $rdf->buildChild('ore:aggregates', array('rdf:resource' => "$doc_url/NormalSequence"));
+  $children[] = $rdf->buildChild('ore:aggregates', array('rdf:resource' => "$doc_url/AnnotationList"));
+  $children[] = $rdf->buildChild('ore:aggregates', array('rdf:resource' => "$doc_url/ImageAnnotations"));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_path_url/Manifest/manifest.xml";
   $children = array();
-  $children[] = $rdf->build_child('ore:describes', array('rdf:resource' => "$doc_url/Manifest"));
-  $children[] = $rdf->build_child('dcterms:modified', NULL, "$timestamp");
-  $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
+  $children[] = $rdf->buildChild('ore:describes', array('rdf:resource' => "$doc_url/Manifest"));
+  $children[] = $rdf->buildChild('dcterms:modified', NULL, "$timestamp");
+  $children[] = $rdf->buildChild('dc:format', NULL, 'application/rdf+xml');
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "urn:uuid:07fbb971-6acb-48ce-9ed4-1789dfe5b3a0";
   $children = array();
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://purl.org/dc/terms/Agent'));
-  $children[] = $rdf->build_child('foaf:name', NULL, "SharedCanvas: Python/rdflib");
-  $children[] = $rdf->build_child('foaf:mbox', NULL, "info@islandora.ca");
-  $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://purl.org/dc/terms/Agent'));
+  $children[] = $rdf->buildChild('foaf:name', NULL, "SharedCanvas: Python/rdflib");
+  $children[] = $rdf->buildChild('foaf:mbox', NULL, "info@islandora.ca");
+  $children[] = $rdf->buildChild('dc:format', NULL, 'application/rdf+xml');
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_url/NormalSequence";
   $children = array();
-  $children[] = $rdf->build_child('ore:isDescribedBy', array('rdf:resource' => "$doc_path_url/NormalSequence/NormalSequence.xml"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/Sequence'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List'));
+  $children[] = $rdf->buildChild('ore:isDescribedBy', array('rdf:resource' => "$doc_path_url/NormalSequence/NormalSequence.xml"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/Sequence'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_path_url/NormalSequence/NormalSequence.xml";
   $children = array();
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
-  $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
+  $children[] = $rdf->buildChild('dc:format', NULL, 'application/rdf+xml');
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_url/ImageAnnotations";
   $children = array();
-  $children[] = $rdf->build_child('ore:isDescribedBy', array('rdf:resource' => "$doc_path_url/ImageAnnotations/ImageAnnotations.xml"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageAnnotationList'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List'));
+  $children[] = $rdf->buildChild('ore:isDescribedBy', array('rdf:resource' => "$doc_path_url/ImageAnnotations/ImageAnnotations.xml"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageAnnotationList'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_path_url/ImageAnnotations/ImageAnnotations.xml";
   $children = array();
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
-  $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
+  $children[] = $rdf->buildChild('dc:format', NULL, 'application/rdf+xml');
   $rdf->addDescriptionNode($name, $children);
-  return $rdf->printRDF();
+  return $rdf->printRdf();
 }
 
 /**
@@ -140,7 +140,7 @@ function get_manifest($doc_url, $doc_path_url) {
  * @return XML
  *   XML generated in the RDF builder.
  */
-function get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width) {
+function islandora_image_annotation_get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/rdf_builder');
   $timestamp = date(DATE_W3C);
   $rdf = new IslandoraRdfBuilder();
@@ -148,38 +148,38 @@ function get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width) {
 
   $name = "$doc_url/NormalSequence";
   $children = array();
-  $children[] = $rdf->build_child('rdf:first', array('rdf:resource' => "$doc_url/Canvas"));
-  $children[] = $rdf->build_child('rdf:rest', array('rdf:resource' => "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"));
-  $children[] = $rdf->build_child('ore:aggregates', array('rdf:resource' => "$doc_url/Canvas"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => "http://www.openarchives.org/ore/terms/Aggregation"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => "http://dms.stanford.edu/ns/Sequence"));
+  $children[] = $rdf->buildChild('rdf:first', array('rdf:resource' => "$doc_url/Canvas"));
+  $children[] = $rdf->buildChild('rdf:rest', array('rdf:resource' => "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"));
+  $children[] = $rdf->buildChild('ore:aggregates', array('rdf:resource' => "$doc_url/Canvas"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => "http://www.openarchives.org/ore/terms/Aggregation"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => "http://dms.stanford.edu/ns/Sequence"));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_path_url/NormalSequence/NormalSequence.xml";
   $children = array();
-  $children[] = $rdf->build_child('ore:describes', array('rdf:resource' => "$doc_url/NormalSequence"));
-  $children[] = $rdf->build_child('dcterms:modified', NULL, "$timestamp");
-  $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
+  $children[] = $rdf->buildChild('ore:describes', array('rdf:resource' => "$doc_url/NormalSequence"));
+  $children[] = $rdf->buildChild('dcterms:modified', NULL, "$timestamp");
+  $children[] = $rdf->buildChild('dc:format', NULL, 'application/rdf+xml');
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_url/Canvas";
   $children = array();
-  $children[] = $rdf->build_child('exif:height', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $height);
-  $children[] = $rdf->build_child('exif:width', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $width);
-  $children[] = $rdf->build_child('dc:title', NULL, "$pid canvas");
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/Canvas'));
+  $children[] = $rdf->buildChild('exif:height', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $height);
+  $children[] = $rdf->buildChild('exif:width', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $width);
+  $children[] = $rdf->buildChild('dc:title', NULL, "$pid canvas");
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/Canvas'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "urn:uuid:07fbb971-6acb-48ce-9ed4-1789dfe5b3a0";
   $children = array();
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://purl.org/dc/terms/Agent'));
-  $children[] = $rdf->build_child('foaf:name', NULL, "SharedCanvas: Python/rdflib");
-  $children[] = $rdf->build_child('foaf:mbox', NULL, "info@islandora.ca");
-  $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://purl.org/dc/terms/Agent'));
+  $children[] = $rdf->buildChild('foaf:name', NULL, "SharedCanvas: Python/rdflib");
+  $children[] = $rdf->buildChild('foaf:mbox', NULL, "info@islandora.ca");
+  $children[] = $rdf->buildChild('dc:format', NULL, 'application/rdf+xml');
 
-  return $rdf->printRDF();
+  return $rdf->printRdf();
 }
 
 /**
@@ -203,73 +203,74 @@ function get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width) {
  * @return XML
  *   XML generated in the RDF builder.
  */
-function get_image_annotations($doc_url, $doc_path_url, $height, $width, $title) {
+function islandora_image_annotation_get_image_annotations($doc_url, $doc_path_url, $height, $width, $title) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/rdf_builder');
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $rdf = new IslandoraRdfBuilder();
   $rdf->root->setAttribute('xmlns:exif', "http://www.w3.org/2003/12/exif/ns#");
   $rdf->root->setAttribute('xmlns:cnt', "http://www.w3.org/2008/content#");
   $rdf->root->setAttribute('xmlns:oa', "http://www.w3.org/ns/openannotation/core/");
-  $option_uuid = generate_uuid();
-  $first_resource = generate_uuid();
+  $option_uuid = islandora_image_annotation_get_uuid();
+  $first_resource = islandora_image_annotation_get_uuid();
   $timestamp = date(DATE_W3C);
 
   $name = "$doc_url/ImageAnnotations";
   $children = array();
-  $children[] = $rdf->build_child('ore:aggregates', array('rdf:resource' => 'urn:uuid:46e74f54-a8e2-41f1-a3a1-24660472c584'));
-  $children[] = $rdf->build_child('rdf:first', array('rdf:resource' => 'urn:uuid:b6cf1868-68f9-4994-90dd-240a4a959358'));
-  $children[] = $rdf->build_child('rdf:rest', array('rdf:nodeID' => 'bCfJsWeh546'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageAnnotationList'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List'));
+  $children[] = $rdf->buildChild('ore:aggregates', array('rdf:resource' => 'urn:uuid:46e74f54-a8e2-41f1-a3a1-24660472c584'));
+  $children[] = $rdf->buildChild('rdf:first', array('rdf:resource' => 'urn:uuid:b6cf1868-68f9-4994-90dd-240a4a959358'));
+  $children[] = $rdf->buildChild('rdf:rest', array('rdf:nodeID' => 'bCfJsWeh546'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/Aggregation'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageAnnotationList'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#List'));
   // @TODO add elements for aggregated annotations.
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_path_url/ImageAnnotations/ImageAnnotations.xml";
   $children = array();
-  $children[] = $rdf->build_child('dcterms:modified', NULL, "$timestamp");
-  $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
-  $children[] = $rdf->build_child('ore:describes', array('rdf:resource' => "$doc_url/ImageAnnotations"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
+  $children[] = $rdf->buildChild('dcterms:modified', NULL, "$timestamp");
+  $children[] = $rdf->buildChild('dc:format', NULL, 'application/rdf+xml');
+  $children[] = $rdf->buildChild('ore:describes', array('rdf:resource' => "$doc_url/ImageAnnotations"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.openarchives.org/ore/terms/ResourceMap'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$first_resource";
   $children = array();
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageAnnotation'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://www.w3.org/ns/openannotation/core/Annotation'));
-  $children[] = $rdf->build_child('oa:hasBody', array('rdf:resource' => $option_uuid));
-  $children[] = $rdf->build_child('oa:hasTarget', array('rdf:resource' => "$doc_url/Canvas"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageAnnotation'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://www.w3.org/ns/openannotation/core/Annotation'));
+  $children[] = $rdf->buildChild('oa:hasBody', array('rdf:resource' => $option_uuid));
+  $children[] = $rdf->buildChild('oa:hasTarget', array('rdf:resource' => "$doc_url/Canvas"));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "urn:uuid:e5c12519-e756-4442-a83d-556848c32714";
   $children = array();
-  $children[] = $rdf->build_child('foaf:name', NULL, "SharedCanvas: Python/rdflib");
-  $children[] = $rdf->build_child('foaf:mbox', NULL, "info@islandora.ca");
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://purl.org/dc/terms/Agent'));
+  $children[] = $rdf->buildChild('foaf:name', NULL, "SharedCanvas: Python/rdflib");
+  $children[] = $rdf->buildChild('foaf:mbox', NULL, "info@islandora.ca");
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://purl.org/dc/terms/Agent'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_url/JPEG";
   $children = array();
-  $children[] = $rdf->build_child('exif:width', array('rdf:datatype' => 'http://www.w3.org/2001/XMLSchema#integer'), $height);
-  $children[] = $rdf->build_child('exif:height', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $width);
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://purl.org/dc/dcmitype/Image'));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageBody'));
+  $children[] = $rdf->buildChild('exif:width', array('rdf:datatype' => 'http://www.w3.org/2001/XMLSchema#integer'), $height);
+  $children[] = $rdf->buildChild('exif:height', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $width);
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://purl.org/dc/dcmitype/Image'));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageBody'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_url/Canvas";
   $children = array();
-  $children[] = $rdf->build_child('exif:width', array('rdf:datatype' => 'http://www.w3.org/2001/XMLSchema#integer'), $height);
-  $children[] = $rdf->build_child('exif:height', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $width);
-  $children[] = $rdf->build_child('dc:title', NULL, "$title");
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/Canvas'));
+  $children[] = $rdf->buildChild('exif:width', array('rdf:datatype' => 'http://www.w3.org/2001/XMLSchema#integer'), $height);
+  $children[] = $rdf->buildChild('exif:height', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $width);
+  $children[] = $rdf->buildChild('dc:title', NULL, "$title");
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/Canvas'));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$option_uuid";
   $children = array();
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageChoice'));
-  $children[] = $rdf->build_child('dms:option', array('rdf:resource' => "$doc_url/JPEG"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageChoice'));
+  $children[] = $rdf->buildChild('dms:option', array('rdf:resource' => "$doc_url/JPEG"));
   $rdf->addDescriptionNode($name, $children);
 
-  return $rdf->printRDF();
+  return $rdf->printRdf();
 }
 
 /**
@@ -284,7 +285,7 @@ function get_image_annotations($doc_url, $doc_path_url, $height, $width, $title)
  * @return XML
  *   XML generated in the RDF builder.
  */
-function get_annotationList($doc_url, $doc_path_url) {
+function islandora_image_annotation_get_annotation_list($doc_url, $doc_path_url) {
 
   module_load_include('inc', 'islandora_image_annotation', 'includes/rdf_builder');
   $timestamp = date(DATE_W3C);
@@ -293,26 +294,26 @@ function get_annotationList($doc_url, $doc_path_url) {
 
   $name = "$doc_url/AnnotationList";
   $children = array();
-  $children[] = $rdf->build_child('rdf:rest', array('rdf:resource' => "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => "http://dms.stanford.edu/ns/AnnotationList"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => "http://www.openarchives.org/ore/terms/Aggregation"));
+  $children[] = $rdf->buildChild('rdf:rest', array('rdf:resource' => "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => "http://dms.stanford.edu/ns/AnnotationList"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => "http://www.openarchives.org/ore/terms/Aggregation"));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_url/Canvas";
   $children = array();
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => "http://dms.stanford.edu/ns/Canvas"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => "http://dms.stanford.edu/ns/Canvas"));
   $rdf->addDescriptionNode($name, $children);
 
   $name = "$doc_path_url/AnnotationList/AnnotationList.xml";
   $children = array();
-  $children[] = $rdf->build_child('ore:describes', array('rdf:resource' => "$doc_url/AnnotationList"));
-  $children[] = $rdf->build_child('rdf:type', array('rdf:resource' => ""));
-  $children[] = $rdf->build_child('dc:format', NULL, 'application/rdf+xml');
-  $children[] = $rdf->build_child('dcterms:modified', NULL, "$timestamp");
+  $children[] = $rdf->buildChild('ore:describes', array('rdf:resource' => "$doc_url/AnnotationList"));
+  $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => ""));
+  $children[] = $rdf->buildChild('dc:format', NULL, 'application/rdf+xml');
+  $children[] = $rdf->buildChild('dcterms:modified', NULL, "$timestamp");
   $rdf->addDescriptionNode($name, $children);
 
-  return $rdf->printRDF();
+  return $rdf->printRdf();
 }
 
 /**
@@ -326,7 +327,7 @@ function get_annotationList($doc_url, $doc_path_url) {
  * @return array
  *   Key value array containing the height and width with their values.
  */
-function get_height_and_width($pid) {
+function islandora_image_annotation_get_height_and_width($pid) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
   $dsid = islandora_image_annotation_get_dsid_from_model($pid);
   $item = islandora_object_load($pid);
@@ -352,7 +353,7 @@ function get_height_and_width($pid) {
     }
     // We could have a RELS-INT without a height and width for our object.
     if (!$image_height || !$image_width) {
-      $height_width_arr = get_image_dimensions_drupal($pid, $dsid, TRUE);
+      $height_width_arr = islandora_image_annotation_get_image_dimensions_drupal($pid, $dsid, TRUE);
     }
     else {
       $image_height = (string) $image_height[0];
@@ -365,7 +366,7 @@ function get_height_and_width($pid) {
   }
   else {
     // Fall back to Djatoka.
-    return get_image_dimensions_drupal($pid, $dsid, TRUE);
+    return islandora_image_annotation_get_image_dimensions_drupal($pid, $dsid, TRUE);
   }
   return $height_width_arr;
 }
@@ -388,7 +389,7 @@ function get_height_and_width($pid) {
  * @throws Exception
  *   Target datastream does not exist.
  */
-function get_image_dimensions_drupal($pid, $dsid, $update = FALSE) {
+function islandora_image_annotation_get_image_dimensions_drupal($pid, $dsid, $update = FALSE) {
 
   if (empty($dsid)) {
     throw Exception('Could not find a datastream id to load for image height and width');
@@ -403,7 +404,7 @@ function get_image_dimensions_drupal($pid, $dsid, $update = FALSE) {
   }
 
   if ($update) {
-    update_or_create_relsint($pid, $dsid, $info);
+    islandora_image_annotation_update_or_create_relsint($pid, $dsid, $info);
   }
   file_delete($image_file);
   return $info;
@@ -424,7 +425,7 @@ function get_image_dimensions_drupal($pid, $dsid, $update = FALSE) {
  * @param array $height_width_arr
  *   An array containing the height and width of the image.
  */
-function update_or_create_relsint($pid, $dsid, $height_width_arr) {
+function islandora_image_annotation_update_or_create_relsint($pid, $dsid, $height_width_arr) {
   if (!isset($height_width_arr['width']) || !isset($height_width_arr['height'])) {
     watchdog('islandora', 'Error adding RELS-INT stream for object %pid. no height or width specified', array('pid%' => $pid));
   }
@@ -494,7 +495,7 @@ XML;
  * @param string $stream
  *   Which stream we are retrieving.
  */
-function islandora_serve($pid, $stream, $width = NULL, $height = NULL) {
+function islandora_image_annotation_islandora_serve($pid, $stream, $width = NULL, $height = NULL) {
   global $base_url;
   module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
   $dsid = islandora_image_annotation_get_dsid_from_model($pid);
@@ -502,22 +503,22 @@ function islandora_serve($pid, $stream, $width = NULL, $height = NULL) {
   $doc_path_url = "$base_url/islandora/anno/serve/$pid";
 
   if ($stream == 'Manifest') {
-    $manifest = get_manifest($doc_url, $doc_path_url);
+    $manifest = islandora_image_annotation_get_manifest($doc_url, $doc_path_url);
     echo $manifest;
     return;
   }
-  $dimensions = get_height_and_width($pid);
+  $dimensions = islandora_image_annotation_get_height_and_width($pid);
 
   $height = $dimensions['height'];
   $width = $dimensions['width'];
 
   if ($stream == 'NormalSequence') {
-    $sequence = get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width);
+    $sequence = islandora_image_annotation_get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width);
     echo $sequence;
     return;
   }
   if ($stream == 'ImageAnnotations') {
-    $image_annotations = get_image_annotations($doc_url, $doc_path_url, $height, $width, NULL);
+    $image_annotations = islandora_image_annotation_get_image_annotations($doc_url, $doc_path_url, $height, $width, NULL);
     echo $image_annotations;
     return;
   }
@@ -529,7 +530,19 @@ function islandora_serve($pid, $stream, $width = NULL, $height = NULL) {
  * @return uuid
  *   Returns the uuid.
  */
-function generate_uuid() {
-  return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000, mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
-  );
+function islandora_image_annotation_get_uuid() {
+  $data;
+  // Module islandora_basic_collection is now
+  // a dependency of islandora_image_annotation.
+  try {
+    $connection = islandora_get_tuque_connection();
+    $configuration['id'] = $connection->repository->getNextIdentifier(NULL, TRUE);
+    $data = explode(":", $configuration['id']);
+  }
+  catch (Exception $e) {
+    throw $e;
+  }
+
+  // Return just the uuid portion of the identifier.
+  return $data[1];
 }

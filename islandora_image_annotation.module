@@ -19,39 +19,39 @@ function islandora_image_annotation_menu() {
     'page callback' => 'drupal_get_form',
     'access arguments' => array('administer site configuration'),
     'page arguments' => array('islandora_image_annotation_admin'),
-    'file' => 'includes/admin.inc',
+    'file' => 'includes/admin.form.inc',
     'type' => MENU_NORMAL_ITEM,
   );
   $items['islandora/anno/test'] = array(
-    'page callback' => 'build_manifest',
+    'page callback' => 'islandora_image_annotation_build_manifest',
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_VIEW),
     'file' => 'includes/build_streams.inc',
   );
 
   $items['islandora/anno/setup'] = array(
-    'page callback' => 'islandora_canvas_setup',
+    'page callback' => 'islandora_image_annotation_canvas_setup',
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_VIEW),
     'file' => 'includes/callbacks.inc',
   );
 
   $items['islandora/anno/add_annotation'] = array(
-    'page callback' => 'islandora_add_annotation',
+    'page callback' => 'islandora_image_annotation_add_annotation',
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_CREATE),
     'file' => 'includes/callbacks.inc',
   );
 
   $items['islandora/anno/get_urns'] = array(
-    'page callback' => 'islandora_shared_get_annotation_pids',
+    'page callback' => 'islandora_image_annotation_shared_get_annotation_pids',
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_VIEW),
     'file' => 'includes/callbacks.inc',
   );
 
   $items['islandora/anno/get_annotation'] = array(
-    'page callback' => 'islandora_shared_get_annotation',
+    'page callback' => 'islandora_image_annotation_shared_get_annotation',
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_VIEW),
     'file' => 'includes/callbacks.inc',
@@ -64,20 +64,20 @@ function islandora_image_annotation_menu() {
   );
 
   $items['islandora/anno/serve'] = array(
-    'page callback' => 'islandora_serve',
+    'page callback' => 'islandora_image_annotation_islandora_serve',
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_VIEW),
     'file' => 'includes/build_streams.inc',
   );
   $items['islandora/anno/update_annotation'] = array(
-    'page callback' => 'islandora_canvas_update_annotation',
+    'page callback' => 'islandora_image_annotation_canvas_update_annotation',
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_CREATE),
     'file' => 'includes/callbacks.inc',
   );
 
   $items['islandora/anno/solr/title/terms/%'] = array(
-    'page callback' => 'islandora_annotations_get_title_terms',
+    'page callback' => 'islandora_image_annotation_get_title_terms',
     'page arguments' => array(5),
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_CREATE),
@@ -85,14 +85,14 @@ function islandora_image_annotation_menu() {
   );
 
   $items['islandora/anno/mads/%'] = array(
-    'page callback' => 'islandora_annotations_get_mads_as_json',
+    'page callback' => 'islandora_image_annotation_get_mads_as_json',
     'page arguments' => array(3),
     'type' => MENU_CALLBACK,
     'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_CREATE),
     'file' => 'includes/callbacks.inc',
   );
 
-  $items['islandora/object/%islandora_object/view/annotation'] = array(
+  $items['islandora/object/%islandora_object/annotation'] = array(
     'title' => 'Image Annotation',
     'page callback' => 'islandora_image_annotation_view',
     'page arguments' => array(2),
@@ -136,7 +136,6 @@ function islandora_image_annotation_access($fedora_object) {
     return FALSE;
   }
 
-  $models = $fedora_object->models;
   $cmodel_list = variable_get('islandora_annotation_mappings');
   foreach ($fedora_object->models as $model) {
     if (isset($cmodel_list[$model])) {
@@ -155,16 +154,8 @@ function islandora_image_annotation_theme($existing, $type, $theme, $path) {
       'template' => 'theme/islandora-image-annotation',
       'variables' => array('islandora_objects' => NULL),
     ),
-    'islandora_annotation_table' => array(
+    'islandora_image_annotation_admin_table' => array(
       'render element' => 'form',
-    ),
-    'islandora_image_annotation_solr' => array(
-      'template' => 'theme/islandora-image-annotation-solr',
-      'variables' => array(
-        'results' => NULL,
-        'elements' => array(),
-        'key_fields' => array(),
-      ),
     ),
   );
 }
@@ -179,7 +170,9 @@ function islandora_image_annotation_theme($existing, $type, $theme, $path) {
  *   The marked up output.
  */
 function islandora_image_annotation_view($object) {
+  global $base_url;
   $output = theme('islandora_image_annotation_view', array('islandora_object' => $object));
+
   return $output;
 }
 
@@ -200,91 +193,12 @@ function islandora_image_annotation_preprocess_islandora_image_annotation_view(&
   $variables['islandora_image_annotation_src'] = $src;
   $variables['islandora_image_annotation_pid'] = $pid;
 
-  drupal_add_js($path . '/shared_canvas/js/window_behaviours.js');
+  drupal_add_css($path . '/css/islandora_annotation.css');
+
+  drupal_add_js($path . '/shared_canvas/js/window_behaviors.js');
 
   // Add css.
-  drupal_add_css($path . '/shared_canvas/css/window_behaviours.css');
-}
-
-/**
- * Adds the image annotation display to the primary displays list in solr.
- *
- * @return array
- *   Array defining the image annotation search results.
- */
-function islandora_image_annotation_islandora_solr_primary_display() {
-  return array(
-    'annotation' => array(
-      'name' => t('Annotation'),
-      'module' => 'islandora_image_annotation',
-      'file' => 'solr/annotation_search_results.inc',
-      'class' => "IslandoraSolrResultsAnno",
-      'function' => "displayResults",
-      'description' => t("Search results for annotations, annotations provide links to their parent objects"),
-    ),
-  );
-}
-
-/**
- * Hook_preprocess function.
- *
- * @global type $base_url
- *
- * @global type $base_path
- *
- * @param array $variables
- *   An associative array containing:
- *   - results: array of returned Solr documents.
- *   - elements: (optional) additional elements to include in the template file.
- *   - key_fields: fields that need in urls. Add them here in case users remove
- *     them in the solr client config section (PID, rels.hasModel, PARENT_pid).
- */
-function islandora_image_annotation_preprocess_islandora_image_annotation_solr(&$variables) {
-  global $base_url;
-  global $base_path;
-
-  $variables['base_url'] = $base_url;
-
-  $variables['base_path'] = $base_path;
-
-  $path = $base_path . drupal_get_path('module', 'islandora_solr');
-
-  $solr_default_img = $path . '/images/defaultimg.png';
-  $variables['elements']['solr_default_img'] = $solr_default_img;
-
-  // Make all variables in 'elements' available as variables in the template
-  // file.
-  foreach ($variables['elements'] as $key => $value) {
-    $variables[$key] = $value;
-  }
-
-  foreach ($variables['results'] as $key => $value) {
-    $object = islandora_object_load($value['PID']['value']);
-    // We may want to return to the parent not the object.
-    $variables['pid_for_url'][$key] = $value['PID']['value'];
-    $pid = $value['PID']['value'];
-    if (isset($variables['key_fields']['rels.hasModel'][$pid]) && $variables['key_fields']['rels.hasModel'][$pid] == 'info:fedora/islandora:OACCModel') {
-      // Create link to parent object.
-      $variables['pid_for_url'][$key] = $variables['key_fields']['PARENT_pid'][$pid] . '/view/annotation';
-      $variables['anno_category'][$key] = isset($value['anno_category_s']['value']) ? $value['anno_category_s']['value'] : '';
-      $variables['anno_title'][$key] = isset($value['anno_title_s']['value']) ? $value['anno_title_s']['value'] : '';
-      $variables['anno_body'][$key] = isset($value['anno_body_t']['value']) ? $value['anno_body_t']['value'] : '';
-      $variables['thumbnail_path'][$key] = url('islandora/object/' . $variables['key_fields']['PARENT_pid'][$pid] . '/datastream/TN');
-      // We want to link to the parent object.
-      $variables['results'][$key]['PID']['value'] = $variables['key_fields']['PARENT_pid'][$pid];
-      $variables['results'][$key]['Anno_ID'] = array(
-        'value' => $pid,
-        'label' => 'Annotation ID',
-        'class' => 'anno-id',
-      );
-    }
-    elseif (isset($object['TN'])) {
-      $variables['thumbnail_path'][$key] = url('islandora/object/' . $pid . '/datastream/TN');
-    }
-    else {
-      $variables['thumbnail_path'][$key] = $path . '/images/defaultimg.png';
-    }
-  }
+  drupal_add_css($path . '/shared_canvas/css/window_behaviors.css');
 }
 
 /**

@@ -4,39 +4,38 @@
   <head>
     <title></title>
 
-    <link type="text/css" rel="stylesheet" href="css/smoothness/jquery-ui-1.8.16.custom.css" />
-
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-    <script type="text/javascript" src="js/jquery/jquery-1.7.js"></script>
-    <script type="text/javascript" src="js/jquery/jquery-ui-1.8.13.custom.min.js"></script>
-
+    <link type="text/css" rel="stylesheet" href="css/smoothness/jquery-ui-1.8.16.custom.css" /> <!-- CORE -->
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /> <!-- CORE -->
+    <script type="text/javascript" src="js/jquery/jquery-1.7.js"></script> <!-- CORE -->
+    <script type="text/javascript" src="js/jquery/jquery-ui-1.8.13.custom.min.js"></script> <!-- CORE -->
 
     <!-- Canvas js -->
-    <script type="text/javascript" src="js/resize-columns.js"></script>
-    <script src="js/jquery.rdfquery.rdfa.min-1.1.js" type="text/javascript"></script>
-    <script src="js/jquery.rdf.turtle.js" type="text/javascript"></script>
+    <script src="js/jquery.rdfquery.rdfa.min-1.1.js" type="text/javascript"></script> <!-- PORT -->
+    <script src="js/jquery.rdf.turtle.js" type="text/javascript"></script> <!-- PORT -->
+    <script src="js/jquery.touchSwipe-1.2.4.js" type="text/javascript"></script> <!-- WHY? -->
+    <script src="js/jquery.jplayer.min.js" type="text/javascript"></script> <!-- WHY? -->
 
-    <script src="js/jquery.touchSwipe-1.2.4.js" type="text/javascript"></script>
-    <script src="js/jquery.jplayer.min.js" type="text/javascript"></script>
+    <script src="js/raphael.js" type="text/javascript"></script> <!-- PORT -->
+    <script src="js/scale.raphael.js" type="text/javascript"></script> <!-- PORT -->
+    <script src="js/uuid.js" type="text/javascript"></script> <!-- PORT -->
 
-    <script src="js/raphael.js" type="text/javascript"></script>
-    <script src="js/scale.raphael.js" type="text/javascript"></script>
-    <script src="js/uuid.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script> <!-- WHY? -->
 
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-
-    <script src="js/ContextMenu/jquery.contextMenu.js" type="text/javascript"></script>
-    <link href="js/ContextMenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" />
+    <script src="js/ContextMenu/jquery.contextMenu.js" type="text/javascript"></script> <!-- REMOVE -->
+    <link href="js/ContextMenu/jquery.contextMenu.css" rel="stylesheet" type="text/css" /> <!-- REMOVE -->
 
 
-    <script src="stable/islandora_image_annotation_init.js" type="text/javascript"></script>
-    <script src="stable/sc_ui.js" type="text/javascript"></script>
+    <script src="stable/islandora_image_annotation_init.js" type="text/javascript"></script>  <!-- PORT -->
+    <script src="stable/sc_ui.js" type="text/javascript"></script> 
     <script src="stable/sc_utils.js" type="text/javascript"></script>
     <script src="stable/sc_pastebin.js" type="text/javascript"></script>
     <script src="stable/sc_rdf.js" type="text/javascript"></script>
     <script src="stable/sc_rdfjson.js" type="text/javascript"></script>
     <script src="stable/sc_create.js" type="text/javascript"></script>
-    <script src="stable/sc_gdata.js" type="text/javascript"></script>
+    <script src="stable/sc_gdata.js" type="text/javascript"></script> <!-- REMOVE -->
+
+
+
 
     <!-- Canvas css -->
     <link rel="stylesheet" href="css/sc.css" type="text/css" />
@@ -46,12 +45,9 @@
     <link type="text/css" rel="stylesheet" href="css/screen.css" />
     <link type="text/css" rel="stylesheet" href="css/style.css" />
 
-
     <!-- Color selector -->
-    <script type="text/javascript" src="js/jquery/jquery.miniColors.js"></script>
+    <script type="text/javascript" src="js/jquery/jquery.miniColors.js"></script> 
     <link type="text/css" rel="stylesheet" href="css/jquery.miniColors.css" />
-
-
   </head>
   <body>
     <!-- Header -->

@@ -5,19 +5,23 @@
  * Build RDF like XML for OAC standard.
  *
  * Convenicence class to build RDF objects.
- *
- * @TODO: Conform to Drupal Coding Standards.
  */
 
 class IslandoraRdfBuilder {
 
-  public $dom_doc = NULL;
+  public $domDoc = NULL;
 
-  function IslandoraRdfBuilder($dom_doc = NULL) {
+  /**
+   * Constructor for IslandoraRdfBuilder class.
+   *
+   * @param XML $dom_doc
+   *   The DOM document.
+   */
+  public function __construct($dom_doc = NULL) {
     if (!isset($dom_doc)) {
-      $this->dom_doc = new DOMDocument('1.0', 'utf-8');
-      $this->dom_doc->formatOutput = TRUE;
-      $this->root = $this->dom_doc->appendChild($this->dom_doc->createElement('rdf:RDF'));
+      $this->domDoc = new DOMDocument('1.0', 'utf-8');
+      $this->domDoc->formatOutput = TRUE;
+      $this->root = $this->domDoc->appendChild($this->domDoc->createElement('rdf:RDF'));
       $this->root->setAttribute('xmlns:dc', "http://purl.org/dc/elements/1.1/");
       $this->root->setAttribute('xmlns:dcterms', "http://purl.org/dc/terms/");
       $this->root->setAttribute('xmlns:dms', "http://dms.stanford.edu/ns/");
@@ -26,117 +30,136 @@ class IslandoraRdfBuilder {
       $this->root->setAttribute('xmlns:rdf', "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     }
     else {
-      $this->dom_doc = $dom_doc;
-      $this->root = $this->dom_doc->documentElement;
+      $this->domDoc = $dom_doc;
+      $this->root = $this->domDoc->documentElement;
     }
   }
 
   /**
-   * Returns value of IslandoraRdfBuilder object as an xml string
-   * @return string
+   * Returns value of IslandoraRdfBuilder object as an xml string.
+   *
+   * @return XML
+   *   The XML we construct.
    */
-  function printRDF() {
-    return $this->dom_doc->saveXML();
+  public function printRdf() {
+    return $this->domDoc->saveXML();
   }
 
   /**
-   * Add description node to existing RDF XML
+   * Add description node to existing RDF XML.
+   *
    * @param string $about
-   * the resource identified in the rdf 'about' attribute
+   *   The resource identified in the RDF 'about' attribute.
    * @param array $children
-   * A structured array of child elements to this node
-   * Each array entry is a sub array with a manditory name, an optional array of attributes, and an optional value
+   *   A structured array of child elements to this node.
+   *
+   *   Each array entry is a sub array with a manditory name, an optional array
+   *   of attributes, and an optional value.
    */
-  function addDescriptionNode($about, $children = NULL) {
-    $description = $this->dom_doc->createElement('rdf:Description');
+  public function addDescriptionNode($about, $children = NULL) {
+    $description = $this->domDoc->createElement('rdf:Description');
     $description = $this->root->appendChild($description);
     $description->setAttribute("rdf:about", $about);
 
     foreach ($children as $child) {
-      $new = $this->dom_doc->createElement($child['name']);
+      $new = $this->domDoc->createElement($child['name']);
       $description->appendChild($new);
       if (isset($child['value'])) {
-        $value = $this->dom_doc->createTextNode($child['value']);
+        $value = $this->domDoc->createTextNode($child['value']);
         $new->appendChild($value);
       }
       if (array_key_exists('attributes', $child)) {
-        foreach ($child['attributes'] as $key => $attVal) {
-          $new->setAttribute($key, $attVal);
+        foreach ($child['attributes'] as $key => $att_val) {
+          $new->setAttribute($key, $att_val);
         }
       }
     }
   }
 
   /**
-   * Takes a Nodelist of Description extracted from external RDF document and adds
-   * them to this object's DOMDocument
-   * @param NodeList $nodeList
+   * Takes NodeList of Description from external RDF, adds to object's root DOM.
+   *
+   * @param NodeList $node_list
+   *   A given NodeList containing RDF descriptions.
    */
-  function addDescriptionsFromNodelist($nodeList) {
-    foreach ($nodeList as $domElement) {
-      $dom_node = $this->dom_doc->importNode($domElement, TRUE);
+  public function addDescriptionsFromNodelist($node_list) {
+    foreach ($node_list as $dom_element) {
+      $dom_node = $this->domDoc->importNode($dom_element, TRUE);
       $this->root->appendChild($dom_node);
     }
   }
 
   /**
-   * Takes a Description element extracted from external RDF document and adds
-   * it to this object's DOMDocument
-   * @param NodeList $nodeList
+   * Takes a Description element from external RDF, adds to object's root DOM.
+   *
+   * @param DOM $dom_element
+   *   A given DOM document containing an RDF description element.
    */
-  function addDescriptionElement($domElement) {
-    $dom_node = $this->dom_doc->importNode($domElement, TRUE);
+  public function addDescriptionElement($dom_element) {
+    $dom_node = $this->domDoc->importNode($dom_element, TRUE);
     $this->root->appendChild($dom_node);
   }
 
-  function setXPath() {
-    $this->xpath = new DOMXPath($this->dom_doc);
+  /**
+   * Sets the XPATH for the IslandoraRdfBuilder object.
+   */
+  public function setXPath() {
+    $this->xpath = new DOMXPath($this->domDoc);
     $this->xpath->registerNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
     $this->xpath->registerNamespace('oa', 'http://www.w3.org/ns/openannotation/core/');
   }
 
-  function deleteDescriptionElement($node_id) {
-    $xpath = new DOMXPath($this->dom_doc);
+  /**
+   * Deletes an RDF description element from the DOM.
+   *
+   * @param string $node_id
+   *   The node id we are searching to remove from.
+   */
+  public function deleteDescriptionElement($node_id) {
+    $xpath = new DOMXPath($this->domDoc);
     $candidates = $xpath->query("//rdf:Description[@rdf:about='$node_id']");
     foreach ($candidates as $candidate) {
-      //$parent = $candidate->parentNode;
-      // $parent->removeChild($candidate);
       $candidate->parentNode->removeChild($candidate);
     }
   }
 
   /**
-   * Convenience method to structure input arrays for addDescriptionNode
+   * Convenience method to structure input arrays for addDescriptionNode.
+   *
    * @param string $name
-   * Name of child tag
+   *   Name of child tag.
    * @param array $attributes
-   * Array of key => value pairs (optional)
+   *   Array of key => value pairs (optional).
    * @param string $value
-   * vale for tag (optional)
+   *   Value for tag (optional).
+   *
    * @return array
+   *   A structured array used in addDescriptionNode.
    */
-  function build_child($name, $attributes = NULL, $value = NULL) {
+  public function buildChild($name, $attributes = NULL, $value = NULL) {
     $return_array = array();
     $return_array['name'] = $name;
     if ($value) {
       $return_array['value'] = $value;
     }
     if ($attributes) {
-      foreach ($attributes as $key => $attVal) {
-        $return_array['attributes'][$key] = $attVal;
+      foreach ($attributes as $key => $att_val) {
+        $return_array['attributes'][$key] = $att_val;
       }
     }
     return $return_array;
   }
 
   /**
+   * Retrieves the uuid of the hasBody node.
    *
    * @param string $id
-   *  the uuid containing urn:uuid:...
+   *   The uuid containing urn:uuid:.
+   *
    * @return string
-   *   a uuid containing urn:uuid:... this is the uuid of the hasBody node
+   *   A uuid containing urn:uuid:. This is the uuid of the hasBody node.
    */
-  function getAnnotationBodyUrn($id) {
+  public function getAnnotationBodyUrn($id) {
     if (empty($this->xpath)) {
       $this->setXPath();
     }
@@ -148,14 +171,15 @@ class IslandoraRdfBuilder {
   }
 
   /**
+   * Retrieves the uuid of the hasTarget node.
    *
    * @param string $id
-   *  the uuid containing urn:uuid:...
-   * @return string
-   *   a uuid containing urn:uuid:... this is the uuid of the hasTarget node
+   *   The uuid containing urn:uuid:.
    *
+   * @return string
+   *   A uuid containing urn:uuid:. This is the uuid of the hasTarget node.
    */
-  function getAnnotationTargetUrn($id) {
+  public function getAnnotationTargetUrn($id) {
     if (empty($this->xpath)) {
       $this->setXPath();
     }
@@ -167,15 +191,15 @@ class IslandoraRdfBuilder {
   }
 
   /**
+   * Retrieves the uuid of the constrained target from the RDF.
    *
    * @param string $id
-   *  the uuid containing urn:uuid:...
+   *   The uuid containing urn:uuid:.
+   *
    * @return string
-   *   a uuid containing urn:uuid:... this is the uuid of the constrainedBy node
-   *
-   *
+   *   A uuid containing urn:uuid:. This is the uuid of the constrainedBy node.
    */
-  function getConstrainedTarget($id) {
+  public function getConstrainedTarget($id) {
     if (empty($this->xpath)) {
       $this->setXPath();
     }
@@ -187,4 +211,3 @@ class IslandoraRdfBuilder {
   }
 
 }
-

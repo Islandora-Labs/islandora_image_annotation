@@ -237,20 +237,12 @@ $(document).ready(function(){
  
     // gets setup information from Islandora
     //determine base of Drupal installation
-
-    var here = window.location.toString();
-    var splitter = here.indexOf('/sites/');
-    if(splitter > 0){
-        splitter = '/sites/';
-    }else{
-        splitter = '/modules/';
-    }
-    base = here.split(splitter);
-    base = base[0];
+    
+    
     PID = $.urlParam('PID');
- 
+    base = window.parent.Drupal.settings.basePath;
     $.ajax({
-        url: base +'/islandora/anno/setup/' + PID,
+        url: base + 'islandora/anno/setup/' + PID,
         async:false,
         success: function(data, status, xhr) {
             islandora_canvas_params = data;
