@@ -355,7 +355,7 @@ function islandora_image_annotation_get_type_terms() {
   $type_field = variable_get('annotation_type_search_field', 'anno_category_s');
   $query = format_string('!field:("!content_model" OR "info:fedora/!content_model")', array(
     '!field' => variable_get('islandora_solr_content_model_field', 'RELS_EXT_hasModel_uri_ms'),
-    '!content_model' => 'islandora:OACCmodel',
+    '!content_model' => 'islandora:OACCModel',
   ));
 
   $params = array(
