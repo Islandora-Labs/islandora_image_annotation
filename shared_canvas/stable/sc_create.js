@@ -486,8 +486,11 @@ function fixXY(what, x, y) {
     x -= offsetLeft;
 	
     // And for scroll in window
-    var pageOffsetTop = $('body').scrollTop();
-    var pageOffsetLeft = $('body').scrollLeft();
+    /*var pageOffsetTop = $('body').scrollTop();
+    var pageOffsetLeft = $('body').scrollLeft();*/
+    // Change made to support embeding shared canvas.
+    var pageOffsetTop = $(window).scrollTop();
+    var pageOffsetLeft = $(window).scrollLeft();
     y += pageOffsetTop;
     x += pageOffsetLeft;
 	

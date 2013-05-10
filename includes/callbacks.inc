@@ -2,21 +2,19 @@
 
 /**
  * @file
- * Functions that implement ajax callbacks.
+ *   Functions that implement ajax callbacks.
  */
 
 /**
- * Ajax callback for Shared Canvas.
- *
- * Supplies the basic data, including maifest uri
- *
+ * Ajax callback for Shared Canvas. Supplies the basic data, including manifest
+ * URI. Returns JSON to be echoed to the client.
  *
  * @param string $pid
- *   The pid of a object.
+ *   The PID of a object.
  */
 function islandora_image_annotation_canvas_setup($pid) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
-  echo islandora_image_annotation_canvas_init($pid);
+  drupal_json_output(islandora_image_annotation_canvas_init($pid));
 }
 
 /**
@@ -31,6 +29,7 @@ function islandora_image_annotation_add_annotation($pid) {
   $data = $_POST['data'];
   $stroke_width = $_POST['strokeWidth'];
   $annotation_xml = islandora_image_annotation_shared_transform_annotation_list(urldecode($_POST['data']), 'html');
+
   $color = $_POST['color'];
   $type = $_POST['type'];
   if (!$type) {
@@ -48,7 +47,12 @@ function islandora_image_annotation_add_annotation($pid) {
   $relationship = array();
   $relationship['relationship'] = 'isMemberOf';
   $relationship['pid'] = $pid;
-  $item = islandora_prepare_new_object($namespace, $labels[0], $datastreams = array(), array('islandora:OACCModel'), array($relationship));
+  $item = islandora_prepare_new_object($namespace,
+    $labels[0],
+    array(),
+    array('islandora:OACCModel'),
+    array($relationship));
+
   $item->label = (string) $labels[0];
 
   $item->relationships->add(ISLANDORA_RELS_EXT_URI, 'targetedBy', $user->name, TRUE);
@@ -144,7 +148,7 @@ QUERY;
 
   $connection = islandora_get_tuque_connection();
   $objects = $connection->repository->ri->sparqlQuery($query);
-
+  $pids = array();
   foreach ($objects as $object) {
     $itemdata = array(
       'id' => $object['id']['value'],

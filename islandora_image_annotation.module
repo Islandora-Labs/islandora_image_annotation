@@ -170,10 +170,7 @@ function islandora_image_annotation_theme($existing, $type, $theme, $path) {
  *   The marked up output.
  */
 function islandora_image_annotation_view($object) {
-  global $base_url;
-  $output = theme('islandora_image_annotation_view', array('islandora_object' => $object));
-
-  return $output;
+  return theme('islandora_image_annotation_view', array('islandora_object' => $object));
 }
 
 /**
@@ -185,20 +182,45 @@ function islandora_image_annotation_view($object) {
  *   An array of variables passed from the theme function.
  */
 function islandora_image_annotation_preprocess_islandora_image_annotation_view(&$variables) {
-  global $base_url;
   $islandora_object = $variables['islandora_object'];
-  $pid = $islandora_object->id;
-  $path = drupal_get_path('module', 'islandora_image_annotation');
-  $src = "$base_url/$path/shared_canvas/index.php?PID=$pid";
-  $variables['islandora_image_annotation_src'] = $src;
-  $variables['islandora_image_annotation_pid'] = $pid;
+  drupal_add_js(array('islandora_image_annotation' => array('PID' => $islandora_object->id)), 'setting');
 
-  drupal_add_css($path . '/css/islandora_annotation.css');
+  $module_path = drupal_get_path('module', 'islandora_image_annotation');
+  $variables['images_path'] = url($module_path . '/shared_canvas/imgs', array('absolute' => TRUE));
 
-  drupal_add_js($path . '/shared_canvas/js/window_behaviors.js');
+  drupal_add_js($module_path . '/shared_canvas/js/jquery/jquery-1.7.js');
+  drupal_add_js($module_path . '/shared_canvas/js/jquery.touchSwipe-1.2.4.js');
+  drupal_add_js($module_path . '/shared_canvas/js/jquery.jplayer.min.js');
+
+  drupal_add_js($module_path . '/shared_canvas/js/jquery/jquery.miniColors.js');
+  drupal_add_css($module_path . '/shared_canvas/css/jquery.miniColors.css');
+
+  drupal_add_js($module_path . '/shared_canvas/js/ContextMenu/jquery.contextMenu.js');
+  drupal_add_css($module_path . '/shared_canvas/js/ContextMenu/jquery.contextMenu.css');
+
+  drupal_add_js($module_path . '/shared_canvas/js/jquery/jquery-ui-1.8.13.custom.min.js');
+  drupal_add_js($module_path . '/shared_canvas/js/jquery.rdfquery.rdfa.min-1.1.js');
+  drupal_add_js($module_path . '/shared_canvas/js/jquery.rdf.turtle.js');
+  drupal_add_js($module_path . '/shared_canvas/js/raphael.js');
+  drupal_add_js($module_path . '/shared_canvas/js/scale.raphael.js');
+  drupal_add_js($module_path . '/shared_canvas/js/uuid.js');
+
+  drupal_add_js($module_path . '/shared_canvas/stable/islandora_image_annotation_init.js');
+  drupal_add_js($module_path . '/shared_canvas/stable/sc_ui.js');
+  drupal_add_js($module_path . '/shared_canvas/stable/sc_utils.js');
+  drupal_add_js($module_path . '/shared_canvas/stable/sc_pastebin.js');
+  drupal_add_js($module_path . '/shared_canvas/stable/sc_rdf.js');
+  drupal_add_js($module_path . '/shared_canvas/stable/sc_rdfjson.js');
+  drupal_add_js($module_path . '/shared_canvas/stable/sc_create.js');
 
   // Add css.
-  drupal_add_css($path . '/shared_canvas/css/window_behaviors.css');
+  drupal_add_css($module_path . '/shared_canvas/css/smoothness/jquery-ui-1.8.16.custom.css');
+
+  drupal_add_css($module_path . '/shared_canvas/css/sc.css');
+  drupal_add_css($module_path . '/shared_canvas/css/islandora_shared_canvas_style.css');
+
+  drupal_add_js($module_path . '/shared_canvas/js/window_behaviors.js');
+  drupal_add_css($module_path . '/shared_canvas/css/window_behaviors.css');
 }
 
 /**

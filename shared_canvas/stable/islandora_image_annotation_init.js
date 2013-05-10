@@ -226,23 +226,10 @@ function maybeResize() {
 // Let's start it up!
 
 $(document).ready(function(){
-    $.urlParam = function(name){
-        var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
-        if (!results)
-        {
-            return 0;
-        }
-        return results[1] || 0;
-    }
- 
     // gets setup information from Islandora
-    //determine base of Drupal installation
-    
-    
-    PID = $.urlParam('PID');
-    base = window.parent.Drupal.settings.basePath;
     $.ajax({
-        url: base + 'islandora/anno/setup/' + PID,
+        url: Drupal.settings.basePath + 'islandora/anno/setup/'
+          + Drupal.settings.islandora_image_annotation.PID,
         async:false,
         success: function(data, status, xhr) {
             islandora_canvas_params = data;

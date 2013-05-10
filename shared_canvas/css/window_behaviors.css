@@ -2,7 +2,7 @@
 
 #full-window-button
 {
- float: left;
+  float: left;
   margin: 5px 5px 5px 0px;
 }
 
@@ -23,7 +23,6 @@
   top: 0px;
 }
 
-
 .islandora-anno-fullwindow .islandora-anno-iframe-wrapper
 {
   position: absolute;
@@ -36,11 +35,4 @@
   z-index: 60;
   
   background: #fff;
-}
-
-.islandora-anno-fullwindow .islandora-anno-iframe-wrapper iframe
-{
-  position: absolute;
-  width: 100%;
-  height: 100% !important; 
 }
