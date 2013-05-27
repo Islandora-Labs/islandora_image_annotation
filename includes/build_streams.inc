@@ -248,7 +248,7 @@ function islandora_image_annotation_get_image_annotations($doc_url, $doc_path_ur
   $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://purl.org/dc/terms/Agent'));
   $rdf->addDescriptionNode($name, $children);
 
-  $name = "$doc_url/JPEG";
+  $name = "$doc_url";
   $children = array();
   $children[] = $rdf->buildChild('exif:width', array('rdf:datatype' => 'http://www.w3.org/2001/XMLSchema#integer'), $height);
   $children[] = $rdf->buildChild('exif:height', array('rdf:datatype' => "http://www.w3.org/2001/XMLSchema#integer"), $width);
@@ -267,7 +267,7 @@ function islandora_image_annotation_get_image_annotations($doc_url, $doc_path_ur
   $name = "$option_uuid";
   $children = array();
   $children[] = $rdf->buildChild('rdf:type', array('rdf:resource' => 'http://dms.stanford.edu/ns/ImageChoice'));
-  $children[] = $rdf->buildChild('dms:option', array('rdf:resource' => "$doc_url/JPEG"));
+  $children[] = $rdf->buildChild('dms:option', array('rdf:resource' => "$doc_url"));
   $rdf->addDescriptionNode($name, $children);
 
   return $rdf->printRdf();
