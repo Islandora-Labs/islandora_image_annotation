@@ -2,7 +2,7 @@
 
 /**
  * @file
- *   Functions that implement ajax callbacks.
+ * Functions that implement ajax callbacks.
  */
 
 /**
@@ -123,27 +123,24 @@ function islandora_image_annotation_shared_transform_annotation_list($xml_in, $i
 function islandora_image_annotation_shared_get_annotation_pids($pid) {
 
   $query = <<<QUERY
-  	PREFIX io: <http://islandora.ca/ontology/relsext#>
-	PREFIX fm: <info:fedora/fedora-system:def/model#>
+    PREFIX io: <http://islandora.ca/ontology/relsext#>
+    PREFIX fm: <info:fedora/fedora-system:def/model#>
 
+    SELECT ?id ?type ?urn ?strokeWidth ?color  from <#ri>
+    WHERE {
+      ?id io:targets <info:fedora/$pid> ;
+      io:hasURN ?urn;
+      io:isAnnotationType ?type;
+      fm:state fm:Active ;
 
-	SELECT ?id ?type ?urn ?strokeWidth ?color  from <#ri>
-	WHERE {
-	        ?id io:targets <info:fedora/$pid> ;
-	            io:hasURN ?urn;
-	            io:isAnnotationType ?type;
-	            fm:state fm:Active ;
-
-
-	             OPTIONAL{
-	             ?id io:strokeWidth ?strokeWidth;
-	            }
-	            OPTIONAL{
-	           ?id io:hasColor ?color
-	          }
-
-	}
-	ORDER BY ASC(?type)
+      OPTIONAL{
+        ?id io:strokeWidth ?strokeWidth;
+      }
+      OPTIONAL{
+        ?id io:hasColor ?color
+      }
+    }
+    ORDER BY ASC(?type)
 QUERY;
 
   $connection = islandora_get_tuque_connection();
@@ -161,7 +158,9 @@ QUERY;
     $pids['pids'][] = $itemdata;
     $pids['types'][] = $object['type']['value'];
   }
-  $pids['types'] = array_values(array_unique($pids['types']));
+  if (!empty($pids)) {
+    $pids['types'] = array_values(array_unique($pids['types']));
+  }
   $json = json_encode($pids);
   echo $json;
 }
