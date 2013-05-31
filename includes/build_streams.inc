@@ -2,7 +2,9 @@
 
 /**
  * @file
- * Functions to build and retrieve oac rdf datastreams in fedora.
+ * Functions to build and retrieve OAC RDF datastreams in fedora.
+ *
+ * @todo clean up the height/width code using paged content.
  */
 
 /**
@@ -473,7 +475,7 @@ XML;
     $about->value = "info:fedora/$pid/$dsid";
     $description->appendChild($about);
     $width = $doc->createElement('width', $height_width_arr['width']);
-    $height = $doc->createElement('height', $height_width_arr['width']);
+    $height = $doc->createElement('height', $height_width_arr['height']);
     $width->setAttribute('xmlns', "http://islandora.ca/ontology/relsint#");
     $height->setAttribute('xmlns', "http://islandora.ca/ontology/relsint#");
     $description->appendChild($width);
