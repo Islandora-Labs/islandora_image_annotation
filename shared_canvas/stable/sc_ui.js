@@ -518,8 +518,11 @@ function paint_imageAnno(anno, canvasId) {
       'collision':'none',
       'offset': '0 0'
     });
-
-    var imge = $('#'+imgid)
+    
+    // William Panting: changed imgid selector because of possible characters needing escaping in jquery.
+    //var imge = $('#'+imgid)
+    var imge = $('.base_img').children(":first");
+    
     imge.width(sw)
     imge.height(sh)
     div.width(sw)

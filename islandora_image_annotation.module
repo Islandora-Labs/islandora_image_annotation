@@ -190,7 +190,6 @@ function islandora_image_annotation_preprocess_islandora_image_annotation_view(&
 
   drupal_add_js($module_path . '/shared_canvas/js/jquery/jquery-1.7.js');
   drupal_add_js($module_path . '/shared_canvas/js/jquery.touchSwipe-1.2.4.js');
-  drupal_add_js($module_path . '/shared_canvas/js/jquery.jplayer.min.js');
 
   drupal_add_js($module_path . '/shared_canvas/js/jquery/jquery.miniColors.js');
   drupal_add_css($module_path . '/shared_canvas/css/jquery.miniColors.css');

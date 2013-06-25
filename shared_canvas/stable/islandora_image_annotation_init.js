@@ -1,6 +1,4 @@
-//adapted from sc_init
-
-var toid = null;
+// Adapted from sc_init of the shared canvas project.
 var startDate = 0;
 
 var topinfo = {
@@ -13,34 +11,34 @@ var topinfo = {
     'sequenceInfo' : {},  // uri to [h,w,title]
 
     'annotations' : {
-        'image':{},
-        'text':{},
-        'audio':{},
-        'zone':{},
-        'comment':{}
+        'image' : {},
+        'text' : {},
+        'audio' : {},
+        'zone' : {},
+        'comment' : {}
     },
     'lists' : {
-        'image':{},
-        'text':{},
-        'audio':{},
-        'zone':{},
-        'comment':{}
+        'image' : {},
+        'text' : {},
+        'audio' : {},
+        'zone' : {},
+        'comment' : {}
     },
     'raphaels' : {
-        'image':{},
-        'text':{},
-        'audio':{},
-        'zone':{},
-        'comment':{}
+        'image' : {},
+        'text' : {},
+        'audio' : {},
+        'zone' : {},
+        'comment' : {}
     },
 
     'zOrders' : {
-        'image':1,
-        'detailImage':1000,
-        'text':2000,
-        'audio':3000,
-        'zone':4000,
-        'comment':5000
+        'image' : 1,
+        'detailImage' : 1000,
+        'text' : 2000,
+        'audio' : 3000,
+        'zone' : 4000,
+        'comment' : 5000
     },
     'canvasDivHash' : {},
     'builtAnnos' : [],
@@ -54,64 +52,31 @@ var SVG_NS = "http://www.w3.org/2000/svg";
 var XLINK_NS = "http://www.w3.org/1999/xlink";
 
 var opts = {
-    base:'http://localhost/EmicShared/impl/',
-    namespaces: {
-        dc:'http://purl.org/dc/elements/1.1/',
-        dcterms:'http://purl.org/dc/terms/',
-        dctype:'http://purl.org/dc/dcmitype/',
-        oa:'http://www.w3.org/ns/openannotation/core/',
-        cnt:'http://www.w3.org/2008/content#',
-        dms:'http://dms.stanford.edu/ns/',
-        rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-        ore:'http://www.openarchives.org/ore/terms/',
-        exif:'http://www.w3.org/2003/12/exif/ns#'
+    base : 'http://localhost/EmicShared/impl/',
+    namespaces : {
+        dc : 'http://purl.org/dc/elements/1.1/',
+        dcterms : 'http://purl.org/dc/terms/',
+        dctype : 'http://purl.org/dc/dcmitype/',
+        oa : 'http://www.w3.org/ns/openannotation/core/',
+        cnt : 'http://www.w3.org/2008/content#',
+        dms : 'http://dms.stanford.edu/ns/',
+        rdf : 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+        ore : 'http://www.openarchives.org/ore/terms/',
+        exif : 'http://www.w3.org/2003/12/exif/ns#'
     }
 };
 
-
 function initCanvas(nCanvas) {
-  
-    var w = $('body').width();
-    topinfo['origBodyWidth'] = w;
-    $('#top_menu_bar').width(w-5);
 
+    var w = $('#canvas-body').width();
+    var h = $('#canvas-body').height();
+    
+    $('#top_menu_bar').width(w - 5);
 
-    // Make n canvases.  Multiple row logic:
-    // 1:  1x1      2: 1x2      3: 1x3
-    // 4:  2x2      5: 1x3+1x2  6: 2x3
-    // 7:  1x4+1x3  8: 2x4      9: 3x3  (etc)
-
-    var rows = Math.floor(Math.sqrt(nCanvas));
-    var perrow = Math.ceil(nCanvas/rows);
-
-    var w = w/perrow - (5*perrow);
-    var h = $(window).height() - 50;
-    h = h/rows;
-
-    for (var x=0;x<nCanvas;x++) {
+    for (var x = 0; x < nCanvas; x++) {
         $('#canvases').append('<div id="canvas_' + x + '" class="canvas"></div>')
-        $('#canvas_'+x).width(w);
-        $('#canvas_'+x).height(h);
-        if (x != 0) {
-            if (x % perrow == 0) {
-                // below previous first in row
-                $('#canvas_'+x).position({
-                    'of':'#canvas_' + (x-perrow),
-                    'my':'left top',
-                    'at':'left bottom',
-                    'collision':'none',
-                    'offset': '0 10'
-                });
-            } else {
-                $('#canvas_' +x).position({
-                    'of':'#canvas_' + (x-1),
-                    'my':'left top',
-                    'at':'right top',
-                    'collision':'none',
-                    'offset': '10 0'
-                });
-            }
-        }
+        $('#canvas_' + x).width(w);
+        $('#canvas_' + x).height(h);
     }
     topinfo['canvasWidth'] = w;
     topinfo['numCanvases'] = nCanvas;
@@ -138,7 +103,7 @@ function init_ui() {
             var nh = pp.height();
             sh.attr('ph', nh);
             p.next().hide();
-            pp.height(h+6);
+            pp.height(h + 6);
 
         } else {
             var n = sh.parent().next();
@@ -151,19 +116,19 @@ function init_ui() {
     });
 
     $('#loadprogress').progressbar({
-        value: 2
+        value : 2
     }).css({
-        height:15,
-        width:300,
-        opacity: 1.0,
-        'z-index': 10000
+        height : 15,
+        width : 300,
+        opacity : 1.0,
+        'z-index' : 10000
     });
     $('#loadprogress').position({
-        of:'#create_annotation',
-        my:'left top',
-        at:'right top',
-        collision:'none',
-        offset:'10 0'
+        of : '#create_annotation',
+        my : 'left top',
+        at : 'right top',
+        collision : 'none',
+        offset : '10 0'
     })
 
     $(".menu_body li:even").addClass("alt");
@@ -175,11 +140,11 @@ function init_ui() {
         var menubody = $('#' + id + '_body')
         menubody.slideToggle('medium');
         menubody.position({
-            'of':'#'+id,
-            'my': 'top left',
-            'at': 'bottom left',
-            'collision':'fit',
-            'offset': '0 8'
+            'of' : '#' + id,
+            'my' : 'top left',
+            'at' : 'bottom left',
+            'collision' : 'fit',
+            'offset' : '0 8'
         })
     });
 
@@ -194,37 +159,34 @@ function init_ui() {
     // Refresh Canvas if browser is resized
     // We're called as per move... so need wait till finished resizing
     $(window).resize(function() {
-        closeAndEndAnnotating();
-        var w = $('body').width();
-        topinfo['bodyWidth'] = w;
-        if (toid != null) {
-            // Be considerate and clear previous timeout
-            window.clearTimeout(toid)
-        }
-        toid = window.setTimeout(maybeResize, 1000)
+        resizeCanvas();
     });
+
+}
+
+var timeout = false;
+var delta = 300;
+function resizeCanvas() {
+  var w = $('#canvas-body').width();
+  if(timeout === false) {
+    timeout = true;
+    closeAndEndAnnotating();
+    window.setTimeout(maybeResize, delta);
+  }
 }
 
 function maybeResize() {
-    var w = $('body').width();
-    // Allow for slight tweak on size from original for scrollbars
-    if (w == topinfo['bodyWidth'] && Math.abs(topinfo['origBodyWidth']-w) > 20) {
-        // We've been stationary for 1 second
-        toid = null;
-        var b = topinfo['origBodyWidth'];
-        topinfo['bodyWidth'] = 0;
-        if (w != b) {
-            initCanvas(topinfo['numCanvases']);
-            showPages();
-        }
-    }
+    timeout = false;
+    var w = $('#canvas-body').width();
+    var image_element = $('.base_img').children(":first");
+    initCanvas(topinfo['numCanvases']);
+    image_element.width(w);
+    image_element.css("height", "auto");
+    $('.base_img').css("height", image_element.height());
+    $('#canvas_0').css("width", w);
 }
 
-
-
-
 // Let's start it up!
-
 $(document).ready(function(){
     // gets setup information from Islandora
     $.ajax({
@@ -238,7 +200,6 @@ $(document).ready(function(){
             alert("Please Login to site");
         },
         dataType: 'json'
-
     });
 
     //establish color-picker if allowed
@@ -247,18 +208,19 @@ $(document).ready(function(){
             $('#anno_color_activated').attr('value', 'active');
         });
         $('.color-picker').miniColors();
-    }else{
-        $('#color-picker-wrapper').empty();
-
     }
-  
+    else{
+        $('#color-picker-wrapper').empty();
+    }
+
     if(islandora_canvas_params.no_edit == true){
         $('#create_annotation').hide();
-    }else{
+    }
+    else{
         $(function(){
             $.contextMenu({
-                selector: '.comment_title',
-                callback: function(key, options) {
+                selector : '.comment_title',
+                callback : function(key, options) {
 
                     var urn = $(this).attr('id');
                     urn = urn.substring(5,100);
@@ -272,7 +234,6 @@ $(document).ready(function(){
                         if (confirm("Permananently Delete Annotation '" + title + "'")) {
                             islandora_deleteAnno(urn);
                         }
-
                     }
 
                     if(key == 'edit'){
@@ -290,15 +251,14 @@ $(document).ready(function(){
                 },
                 items: {
                     "edit": {
-                        name: "Edit",
-                        icon: "edit",
-                        accesskey: "e"
+                        name : "Edit",
+                        icon : "edit",
+                        accesskey : "e"
                     },
-                    "delete": {
-                        name: "Delete annotation",
-                        icon: "delete"
+                    "delete" : {
+                        name : "Delete annotation",
+                        icon : "delete"
                     }
-
                 }
             });
         });
@@ -313,31 +273,30 @@ $(document).ready(function(){
         $(islandora_canvas_params.categories).each(function() {
             value = this.toString();
             sel.append($("<option>").attr('value',value).text(value));
-        // titles.append($("<option>").attr('value',value).text(value));
         });
-    }else{
+    }
+    else{
         $( "#anno_classification" ).autocomplete({
-            source: islandora_canvas_params.categories
+            source : islandora_canvas_params.categories
         });
     }
     if(islandora_canvas_params.islandora_anno_use_title_vocab == 1){
         $('#islandora_titles').empty();
         $('<label for="anno_title">Title:</label>').appendTo('#islandora_titles');
-        var titles = $('<select  id="anno_title">').appendTo('#islandora_titles');  
+        var titles = $('<select  id="anno_title">').appendTo('#islandora_titles');
         titles.append($("<option>").attr('value','--Choose a type--').text('--Choose a type above to populate--'));
     }
-    
-   
-    $("#anno_classification").change(function()  
-    {           
+
+    $("#anno_classification").change(function()
+    {
         if(islandora_canvas_params.islandora_anno_use_title_vocab == 1){
-            var id=$(this).val();   
-            var base_url = islandora_canvas_params.islandora_base_url+'islandora/anno/solr/title/terms/';
-            $.getJSON(base_url+id,{
-                id: $(this).val(), 
-                ajax: 'true'
+            var id=$(this).val();
+            var base_url = islandora_canvas_params.islandora_base_url + 'islandora/anno/solr/title/terms/';
+            $.getJSON(base_url + id,{
+                id : $(this).val(),
+                ajax : 'true'
             }, function(j){
-                var options = '<option value="nothing">--Select from ' + id +'--</option>';
+                var options = '<option value="nothing">--Select from ' + id + '--</option>';
                 for (var i = 0; i < j.length; i++){
                     var fieldName, objectPid;
                     $.each(j[i], function (key, val){
@@ -347,47 +306,45 @@ $(document).ready(function(){
                             fieldName = val;
                         }
                     });
-                    options += '<option value="'+ objectPid + '">' + fieldName + '</option>';
+                    options += '<option value="' + objectPid + '">' + fieldName + '</option>';
                 }
                 if(j.length == 0){
                     $('#islandora_titles').empty();
                     $('#islandora_titles').append('<label for"anno_title">Title:</label>');
                     $('#islandora_titles').append('<input id="anno_title" type="text" size="28"/>');
-                    
-                } else {
+                }
+                else {
                     $('#islandora_titles').empty();
                     $('<label for="anno_title">Title:</label>').appendTo('#islandora_titles');
-                    var titles = $('<select  id="anno_title">').appendTo('#islandora_titles');  
-                    titles.append($("<option>").attr('value','--Choose a type--').text('--Choose a type above to populate--'));            
+                    var titles = $('<select  id="anno_title">').appendTo('#islandora_titles');
+                    titles.append($("<option>").attr('value','--Choose a type--').text('--Choose a type above to populate--'));
                     $('#anno_title').html(options);
-                    $("#anno_title").change(function()  
-                    {                
-                        var id=$(this).val();             
-                        var mads_url = islandora_canvas_params.islandora_base_url+'islandora/anno/mads/';           
+                    $("#anno_title").change(function()
+                    {
+                        var id = $(this).val();
+                        var mads_url = islandora_canvas_params.islandora_base_url + 'islandora/anno/mads/';
                         $.getJSON(mads_url+id,{
-                            id: $(this).val(), 
-                            ajax: 'true'
-                        }, function(mads){               
+                            id : $(this).val(),
+                            ajax : 'true'
+                        }, function(mads){
                             var mads_text = "";
                             $.each(mads, function(i, val) {
-                                mads_text += i +': ' +val + '\n\n';                   
+                                mads_text += i +': ' +val + '\n\n';
                             });
                             $('#anno_text').val(mads_text);
                         });
-           
-                    });  
+                    });
                 }
             });
         }
-           
-    });  
-    
+    });
+
     var stroke_widths = islandora_canvas_params.islandora_anno_stroke_widths.split(" ");
     var s_options = "";
-    for (var i = 0; i < stroke_widths.length; i++){                    
-                    s_options += '<option value="'+ stroke_widths[i] + '">' + stroke_widths[i] + '</option>';
-                }
-                
+    for (var i = 0; i < stroke_widths.length; i++) {
+        s_options += '<option value="'+ stroke_widths[i] + '">' + stroke_widths[i] + '</option>';
+    }
+
     $('#stroke-width-wrapper').empty();
     $('#stroke-width-wrapper').append('<label for"stroke_width">Stroke Width:</label>');
     $('#stroke-width-wrapper').append('<select id="stroke_width" />');
@@ -411,28 +368,22 @@ $(document).ready(function(){
             if (key == 's') {
                 start = parseInt(val);
                 uriparams['s'] = start;
-            } else if (key == 'n') {
+            }
+            else if (key == 'n') {
                 nCanvas = parseInt(val);
                 uriparams['n'] = nCanvas;
             }
         }
     }
     topinfo['uriParams'] = uriparams
- 
 
     // Initialize UI
     init_ui();
     // Setup a basic Canvas with explicit width to scale to from browser width
     initCanvas(nCanvas);
-   
 
-    // Manifest Initialization
-    var manuri = islandora_canvas_params.manifest_url;
-    if (manuri != undefined) {
-        fetchTriples(manuri, rdfbase, cb_process_manifest);
-    } else {
-        repouri = $('#repository').attr('href');
-        fetchTriples(repouri, rdfbase, cb_process_repository);
-    }
-
+    // Manifest initialization.
+    fetchTriples(islandora_canvas_params.manifest_url,
+                 rdfbase,
+                 cb_process_manifest);
 });

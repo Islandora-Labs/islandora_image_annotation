@@ -101,6 +101,8 @@ function saveAndEndAnnotating() {
     var okay = saveAnnotation();
     if (okay) {
         closeAndEndAnnotating();
+        // After rebuild, resize.
+        resizeCanvas();
     }
 }
 
@@ -193,8 +195,6 @@ function destroyAll(canvas) {
         $(r).remove();
     }
     topinfo['raphaels']['comment'][canvas] = undefined;
-
-    islandora_getList();
 }
 
 function saveAnnotation() {
