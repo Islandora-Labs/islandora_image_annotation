@@ -269,7 +269,7 @@ function cb_process_sequence(qry, uri) {
 
 function fetch_annotations(which, canvas) {
 	
-  var	tal = topinfo['lists'][which][canvas];
+  var tal = topinfo['lists'][which][canvas];
   if (tal == undefined) {
     tal = topinfo['lists'][which]['*'];
   }
@@ -292,14 +292,13 @@ function fetch_annotations(which, canvas) {
   }
 }
 
-
+var ancCnt = 0;
 function cb_process_annoList(qry, uri) {
  
   ping_progressBar('recv:'+uri);
-	
+  
   var nss = opts.namespaces;
   var allAnnos = topinfo['annotations'];
-	
   var zorder = {};
   // Walk through aggregation/list of annos
   if (uri != undefined) {
@@ -307,7 +306,7 @@ function cb_process_annoList(qry, uri) {
     var top = null;
     qry.where('<' + uri + '> ore:describes ?seq')
     .each(function() {
-      top = this.seq.value.toString()
+      top = this.seq.value.toString();
     });
     if (top != null) {
       var l = rdf_to_list(qry, top);
@@ -316,6 +315,8 @@ function cb_process_annoList(qry, uri) {
         zorder[l[x]] = parseInt(x)+1;
       }
     }
+  } else {
+	  console.log("uri is not defined");
   }
 
   var xmlfiles = {};
@@ -425,7 +426,6 @@ function cb_process_annoList(qry, uri) {
     };
   }
   topinfo['annotations'] = allAnnos;
-
   // Try to force GC on the query
   delete qry.databank;
   qry = null;
@@ -454,7 +454,7 @@ function cb_process_annoList(qry, uri) {
               if (txtsel) {
                 var btxt = $(data).find(sel).text().substring(txtsel[0], txtsel[1]);
               } else {
-                var btxt = $(data).find(sel); // leave it up to Paint to deal with
+                var btxt = $(data).find(sel); // leave it up to Paint to deal with.
               }
             } else {
               var btxt = data;

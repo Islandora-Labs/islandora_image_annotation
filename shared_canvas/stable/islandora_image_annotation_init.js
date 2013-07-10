@@ -1,3 +1,24 @@
+// Toggle full window shared canvas.
+(function ($) {
+  Drupal.behaviors.islandorAnnoFullWindow = {
+    attach: function (context, settings) {
+      $('#full-window-button').click(function() {
+
+        $('.islandora-anno-wrapper').toggleClass('islandora-anno-fullwindow');
+        resizeCanvas();
+
+        if ($(this).val() == Drupal.t('Full Window')) {
+          $(this).val(Drupal.t('Exit Full Window'));
+        }
+        else {
+          $(this).val(Drupal.t('Full Window'));
+        }
+      });
+    }
+  };
+})(jQuery);
+
+
 // Adapted from sc_init of the shared canvas project.
 var startDate = 0;
 
@@ -67,7 +88,6 @@ var opts = {
 };
 
 function initCanvas(nCanvas) {
-
     var w = $('#canvas-body').width();
     var h = $('#canvas-body').height();
     
@@ -89,6 +109,9 @@ function initCanvas(nCanvas) {
 
 
 function init_ui() {
+
+  var anno_d = annotation_dialog();
+  anno_d.dialog('close');
 
     $('.dragBox').draggable().resizable();
     $('.dragBox').hide();
@@ -155,7 +178,10 @@ function init_ui() {
     // XXX Remove annotation button and shape menu
 
     }
-
+    $('#color-picker-wrapper').click(function(){
+        $('#anno_color_activated').attr('value', 'active');
+      });
+      $('.color-picker').miniColors();
     // Refresh Canvas if browser is resized
     // We're called as per move... so need wait till finished resizing
     $(window).resize(function() {
@@ -179,6 +205,7 @@ function maybeResize() {
     timeout = false;
     var w = $('#canvas-body').width();
     var image_element = $('.base_img').children(":first");
+    console.log("maby resize numCanvases: " + topinfo['numCanvases']);
     initCanvas(topinfo['numCanvases']);
     image_element.width(w);
     image_element.css("height", "auto");
@@ -373,6 +400,7 @@ $(document).ready(function(){
                 nCanvas = parseInt(val);
                 uriparams['n'] = nCanvas;
             }
+            console.log("nCanvas value: " + nCanvas);
         }
     }
     topinfo['uriParams'] = uriparams

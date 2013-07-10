@@ -9,7 +9,7 @@
 }
 
 #main {
-  margin: 0 0 0 250px;
+  margin: 0 0 0 0;
 }
 
 #reference-image {
@@ -961,7 +961,6 @@ div.mceDropDown {
 #create_annotation_box #create_annos_block
 {
   float: left;
-  width: 360px;
   padding: 5px 10px 10px 10px;
 }
 

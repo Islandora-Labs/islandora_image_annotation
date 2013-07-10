@@ -7,6 +7,13 @@
  * Convenicence class to build RDF objects.
  */
 
+/**
+ * IslandoraRdfBuilder
+ *
+ * Islandora's wrapper to interact with
+ * RDF data.
+ * @author discoverygarden
+ */
 class IslandoraRdfBuilder {
 
   public $domDoc = NULL;

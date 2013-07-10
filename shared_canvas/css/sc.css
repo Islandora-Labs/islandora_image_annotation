@@ -263,7 +263,6 @@ A:link {
 .dragBox {
 	background: white;
 	width: 400px;
-	z-index: 10000;
 	border: 1px solid black;
 	position: absolute;
 }

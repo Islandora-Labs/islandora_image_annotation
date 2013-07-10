@@ -845,9 +845,9 @@ function paint_commentAnno(anno, canvasId) {
   block += '<div class="comment_text">' + '<div class="comment_type">' + annoType + '</div><div class="comment_content">' + txt + '</div></div>';
   block += '</div>';
   
-
   selectBlock = "#islandora_annoType_content_" + fixed_annotype;
-  $(selectBlock).append(block);
+  if($(selectBlock).append(block)) {
+  }
   $('#anno_' + myid).attr('canvas', canvasId);
 
   $('#delete_anno_'+myid).click(function(e){
@@ -897,12 +897,15 @@ function paint_commentAnnoTargets(ttldiv, canvasId, annoId, annoType) {
       if(islandora_canvas_params.mappings['urn:uuid:' + annoId] != '' && islandora_canvas_params.can_choose){
         col = islandora_canvas_params.mappings[['urn:uuid:' + annoId]];
       }
-      if(islandora_canvas_params.strokeWidth['urn:uuid:' + annoId] != ''){
+      if(islandora_canvas_params.islandora_anno_stroke_width != null) {
+        strokeWidth = islandora_canvas_params.islandora_anno_stroke_width;
+      } else if(islandora_canvas_params.strokeWidth['urn:uuid:' + annoId] != ''){
         strokeWidth = islandora_canvas_params.strokeWidth[['urn:uuid:' + annoId]];
       } else {
         strokeWidth = $('#stroke_width').val();
       }
-    
+      
+
       $(ttldiv).append('<span color="' + col + '" class="mycolor" style="margin-right: 2px; margin-top: 2px; background: '+col+';float:right;width:15px;height:15px;">&nbsp;</span>');
       for (var t = 0, tgt; tgt = anno.targets[t]; t++) {
         if (tgt.partOf != null) {

@@ -116,10 +116,10 @@ function islandora_image_annotation_admin($form, &$form_state) {
     '#options' => array(0 => t('User defined (user selects when creating annotation)'), 1 => t("Optimized (Colors are selected randomly. Recommended for overlapping annotations)")),
     '#default_value' => $optimized,
   );
-  $form['annotation_colors_fs']['annotation_stroke_widths'] = array(
+  $form['annotation_colors_fs']['image_annotation_annotation_stroke_width'] = array(
     '#type' => 'textfield',
     '#title' => t('Annotation stroke widths for drop down'),
-    '#default_value' => variable_get('annotation_stroke_widths', '.3 .6. .9  1.2 1.5'),
+    '#default_value' => variable_get('image_annotation_annotation_stroke_width', '.3 .6. .9  1.2 1.5'),
     '#description' => t('The width of the lines to use when drawing the annotations. Must be a number,
       can include a decimal.  For instance .5 is valid.  You can Enter several values here seperated by a space.'),
     '#required' => TRUE,
@@ -198,5 +198,5 @@ function islandora_image_annotation_admin_submit($form, &$form_state) {
   variable_set('annotation_title_search_field', $form_state['values']['annotation_title_search_field']);
   variable_set('annotation_genre_search_field', $form_state['values']['annotation_genre_search_field']);
   variable_set('annotation_type_search_field', $form_state['values']['annotation_type_search_field']);
-  variable_set('annotation_stroke_widths', $form_state['values']['annotation_stroke_widths']);
+  variable_set('image_annotation_annotation_stroke_width', $form_state['values']['image_annotation_annotation_stroke_width']);
 }

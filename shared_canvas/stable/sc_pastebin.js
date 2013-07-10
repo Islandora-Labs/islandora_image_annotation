@@ -38,7 +38,6 @@ function islandora_getList() {
         success: function(data,status,xhr) {
             var listdata = $.parseJSON(data);
             var pids = listdata.pids;
-
             if( pids != null){
                 for (var i=0,info;i < pids.length;i++){
                     islandora_canvas_params.mappings[pids[i]['urn']] = pids[i]['color']
@@ -63,12 +62,8 @@ function islandora_getList() {
                             $('#comment_annos_block').append(header);
                         }
                     }
-
-                    $('#canvases .canvas').each(function() {
-                        // console.log(temp + " " + pid)
-                        var cnv = $(this).attr('canvas');
-                        islandora_getAnnotation(pid);
-                    });
+                    var cnv = $(this).attr('canvas');
+	                islandora_getAnnotation(pid);
                     var type = temp;
                 }
             }
@@ -91,7 +86,6 @@ function islandora_getList() {
 // get annotation data from Fedora and send it to load_comment_anno to be displayed
 
 function islandora_getAnnotation(pid) {
-
     $.ajax({
         type:'GET',
         url: islandora_canvas_params.islandora_get_annotation + pid,

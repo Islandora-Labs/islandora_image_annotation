@@ -213,6 +213,7 @@ function islandora_image_annotation_shared_get_annotation($pid, $urn = NULL) {
     $pid = islandora_image_annotation_canvas_get_pid_from_urn($urn);
   }
   $xml = islandora_image_annotation_get_annotation_data($pid);
+
   $results = islandora_image_annotation_shared_transform_annotation_list($xml, 'rdf');
   // Remove the doc type declarations.
   $results = preg_replace('/<\?xml.*?\?>/', '', $results);
