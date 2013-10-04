@@ -28,33 +28,29 @@ function islandora_postData(title, data, type, color) {
 //
 
 function islandora_getList() {
- 
     islandora_canvas_params.mappings = new Array();
     islandora_canvas_params.strokeWidth = new Array;
     $.ajax({
         type:'GET',
-        async:false,
+        async:true,
         url: islandora_canvas_params.get_annotation_list_url,
         success: function(data,status,xhr) {
             var listdata = $.parseJSON(data);
             var pids = listdata.pids;
             if( pids != null){
                 for (var i=0,info;i < pids.length;i++){
-                    islandora_canvas_params.mappings[pids[i]['urn']] = pids[i]['color']
-                    islandora_canvas_params.strokeWidth[pids[i]['urn']] = pids[i]['strokeWidth']
+                    islandora_canvas_params.mappings[pids[i]['urn']] = pids[i]['color'];
+                    islandora_canvas_params.strokeWidth[pids[i]['urn']] = pids[i]['strokeWidth'];
                     info=pids[i]['id'];
                     var pid = info;
                     var temp = pids[i]['type'];
                     var fixed_cat = temp.replace(/[^\w]/g,'');
                     if(temp != type){
-
                         var type_class = "annoType_" + fixed_cat;
                         var blockId = 'islandora_annoType_'+ fixed_cat;
                         var contentId = 'islandora_annoType_content_'+ fixed_cat;
                         var idSelector = '#' + blockId;
-    
                         if($(idSelector).length == 0){
-
                             header =  '<div class = "islandora_comment_type" id = "'+ blockId + '">';
                             header += '<div class = "islandora_comment_type_title">' + temp + '</div>';
                             header += '<div class = "islandora_comment_type_content" style = "display:none" id = "'+ contentId + '"></div>';
@@ -66,16 +62,23 @@ function islandora_getList() {
 	                islandora_getAnnotation(pid);
                     var type = temp;
                 }
+            if( listdata!= null && pids != null){
+                for (var i=0,info;i < pids.length;i++){
+                  islandora_canvas_params.mappings[pids[i]['urn']] = pids[i]['color'];
+                  // There was a for each loop here, part of the 
+                  // excessive server post request fix.
+                  var pid = pids[i]['id'];
+                  islandora_getAnnotation(pids[i]['id']);
+                  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                }
+              }
             }
-
             $(".islandora_comment_type_title").off();
-
             $(".islandora_comment_type_title").ready().on("click", function(){
                 $(this).siblings('.islandora_comment_type_content').toggle();
             });
         },
         error: function(data,status,xhr) {
-        // alert('Failed to retrieve List')
         }
 
     });

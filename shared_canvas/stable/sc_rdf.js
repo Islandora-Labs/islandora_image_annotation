@@ -69,9 +69,8 @@ function extract_canvas_size(qry, uri) {
 
 // Top level Manifest of other Aggregations of resources
 function cb_process_manifest(qry, uri) {
+  //ping_progressBar('manifest');
 
-  ping_progressBar('manifest');
-	
   // Find Sequences
   var seqs = [];
   // And find all the other types
@@ -91,7 +90,6 @@ function cb_process_manifest(qry, uri) {
   var zoneAnnos = {
     '*':[]
   };
-
   qry
   .where('<' + uri +'> ore:describes ?aggr')
   .where('?aggr ore:aggregates ?seq')
@@ -100,7 +98,7 @@ function cb_process_manifest(qry, uri) {
     seqs.push(this.seq.value);
   });
   qry.reset();
-
+  
   qry
   .where('<' + uri +'> ore:describes ?aggr')
   .where('?aggr ore:aggregates ?seq')
@@ -111,11 +109,11 @@ function cb_process_manifest(qry, uri) {
     c = (this.canv == undefined) ? '*' : this.canv.value;
     what = this.seq.value;
     if (c == '*') {
-      imgAnnos[c].push(what)
+      imgAnnos[c].push(what);
     } else if (imgAnnos[c] == undefined) {
-      imgAnnos[c] = [what]
+      imgAnnos[c] = [what];
     } else {
-      imgAnnos[c].push(what)
+      imgAnnos[c].push(what);
     }
   })
       
@@ -135,7 +133,6 @@ function cb_process_manifest(qry, uri) {
   .end()
   .where('?seq rdf:type dms:AudioAnnotationList')
   .each(function() {
-          
     c = (this.canv == undefined) ? '*' : this.canv.value;
     what = this.seq.value;
     if (c == '*') {
@@ -182,14 +179,12 @@ function cb_process_manifest(qry, uri) {
   .each(function() {
     ranges.push([this.title.value, this.f.value])
   });
-
   topinfo['ranges'] = ranges
   topinfo['lists']['text'] = textAnnos;
   topinfo['lists']['image'] = imgAnnos;
   topinfo['lists']['audio'] = audioAnnos;
   topinfo['lists']['comment'] = commentAnnos;
   topinfo['lists']['zone'] = zoneAnnos;
-		
   if (seqs.length == 1) {
     var uri2 = getRemForAggr(seqs[0], qry)
     ping_progressBar('manifestDone')
@@ -268,7 +263,6 @@ function cb_process_sequence(qry, uri) {
 
 
 function fetch_annotations(which, canvas) {
-	
   var tal = topinfo['lists'][which][canvas];
   if (tal == undefined) {
     tal = topinfo['lists'][which]['*'];
@@ -294,7 +288,6 @@ function fetch_annotations(which, canvas) {
 
 var ancCnt = 0;
 function cb_process_annoList(qry, uri) {
- 
   ping_progressBar('recv:'+uri);
   
   var nss = opts.namespaces;

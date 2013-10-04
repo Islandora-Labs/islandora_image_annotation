@@ -98,7 +98,6 @@ function islandora_image_annotation_canvas_init($pid) {
     $categories = islandora_image_annotation_get_type_terms();
   }
   $results = array();
-
   $results['object_base'] = url("islandora/object/$pid");
   $results['no_edit'] = !user_access(ISLANDORA_IMAGE_ANNOTATION_CREATE);
   $results['categories'] = $categories;
@@ -129,11 +128,10 @@ function islandora_image_annotation_canvas_init($pid) {
  */
 function islandora_image_annotation_include_common_js() {
   $image_annotation_module_path = drupal_get_path('module', 'islandora_image_annotation');
-  drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery/jquery-1.7.js');
-  drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery/jquery-ui-1.8.13.custom.min.js');
-  drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery/jquery.contextmenu.js');
+
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery/jquery.watermark.min.js');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/ContextMenu/jquery.contextMenu.js');
+
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery/jquery.svg.js');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery.rdfquery.rdfa.min-1.1.js');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery.rdf.turtle.js');
@@ -142,7 +140,6 @@ function islandora_image_annotation_include_common_js() {
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/scale.raphael.js');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/uuid.js');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery/jquery.miniColors.js');
-  drupal_add_js($image_annotation_module_path . '/shared_canvas/stable/dialog_annotate.js');
 
   drupal_add_js($image_annotation_module_path . '/shared_canvas/stable/sc_ui.js');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/stable/sc_utils.js');
@@ -161,7 +158,7 @@ function islandora_image_annotation_include_common_js() {
  */
 function islandora_image_annotation_include_common_css() {
   $image_annotation_module_path = drupal_get_path('module', 'islandora_image_annotation');
-  
+
   drupal_add_css($image_annotation_module_path . '/shared_canvas/js/ContextMenu/jquery.contextMenu.css');
   drupal_add_css($image_annotation_module_path . '/shared_canvas/css/jquery.miniColors.css');
   drupal_add_css($image_annotation_module_path . '/shared_canvas/css/sc.css');

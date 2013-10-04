@@ -273,21 +273,19 @@ function showCanvas(canvas, canvasId) {
   }
 
   // Start sucking down annotations
+  fetch_comment_annotations();
   fetch_annotations('zone', canvas);
   fetch_annotations('image', canvas);
   fetch_annotations('text', canvas);
   fetch_annotations('audio', canvas);
   fetch_annotations('comment', canvas);
   fetch_comment_annotations();
-
 }
-
 
 function paint_annos() {
   // Step through all displayed canvases and paint all finished, unpainted annos
   // Do it this way as can't predict when annos will be available due to
   // different AJAX speeds
-
   for (canvas in topinfo['canvasDivHash']) {
     var div = topinfo['canvasDivHash'][canvas];
     for (typ in topinfo['annotations']) {
@@ -305,10 +303,6 @@ function paint_annos() {
 
 
 function mk_raphael(typ, canvas, canvasId) {
-
-  if (topinfo['raphaels'][typ][canvas] != undefined) {
-    return topinfo['raphaels'][typ][canvas];
-  } else {
     var info = topinfo['sequenceInfo'][canvas];
     if (info == undefined) {
       info = extract_canvas_size(topinfo['query'], canvas)
@@ -316,7 +310,6 @@ function mk_raphael(typ, canvas, canvasId) {
     }
     var cvsw = info[1];
     var cvsh = info[0];
-
     var scale = topinfo['canvasWidth'] / cvsw;
     var sh = cvsh * scale;
     var sw = cvsw * scale;
@@ -343,8 +336,6 @@ function mk_raphael(typ, canvas, canvasId) {
     }
     topinfo['raphaels'][typ][canvas] = svgcanvas;
     return svgcanvas;
-  }
-
 }
 
 function paint_anno(typ, anno, div) {
@@ -433,7 +424,6 @@ function show_zpr(what) {
 }
 
 function paint_imageAnno(anno, canvasId) {
-
   var canvas = $('#' + canvasId).attr('canvas');
   var info = topinfo['sequenceInfo'][canvas];
   var cvsw = info[1];
@@ -525,7 +515,7 @@ function paint_imageAnno(anno, canvasId) {
     
     imge.width(sw)
     imge.height(sh)
-    div.width(sw)
+    //div.width(sw)
     div.height(sh);
     div.css('z-index', topinfo['zOrders']['image']);
 
@@ -601,7 +591,7 @@ function paint_imageAnno(anno, canvasId) {
     var div = $('#' + myid);
     div.css('z-index', zIdx);
     div.height(divh);
-    div.width(divw);
+   // div.width(divw);
 
     img = $('#img_' + myid);
 
@@ -894,7 +884,7 @@ function paint_commentAnnoTargets(ttldiv, canvasId, annoId, annoType) {
       } else {
         var col = svgAreaColors.splice(0,1)[0];
       }
-      if(islandora_canvas_params.mappings['urn:uuid:' + annoId] != '' && islandora_canvas_params.can_choose){
+      if(islandora_canvas_params.mappings['urn:uuid:' + annoId] != ''){
         col = islandora_canvas_params.mappings[['urn:uuid:' + annoId]];
       }
       if(islandora_canvas_params.islandora_anno_stroke_width != null) {
@@ -942,11 +932,6 @@ function paint_svgArea(svgc, annoId, col, svg, strokeWidth) {
   pthelm.setAttribute('class', 'svg_' + annoId);
   svgc.canvas.appendChild(pthelm);
 }
-
-
-
-
-
 
 // UI Callbacks:  Navigation
 

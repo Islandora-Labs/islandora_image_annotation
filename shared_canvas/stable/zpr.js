@@ -264,7 +264,6 @@ var zpr = function(viewFinderId, inputValues) {
       
       var insetValueX = attrs.x * tileSize * multiplier;
       var insetValueY = attrs.y * tileSize * multiplier;        
-      //console.log('x=' + attrs.x + ', y=' + attrs.y);
       
       attrs.id = 'tile-x' + attrs.x + 'y' + attrs.y + 'z' + currentLevel + 'r' + currentRotation + '-' + viewFinderId;      
       attrs.src = jp2.djatokaURL + '&svc.level=' + currentLevel + '&svc.region=' + insetValueY + ',' + insetValueX + ',' + tileSize + ',' + tileSize + '&svc.rotate=' + currentRotation;
@@ -326,7 +325,6 @@ var zpr = function(viewFinderId, inputValues) {
     imgFrame.find('img').each(function(index) {
       if (/^tile-x/.test(this.id) && !visibleTilesMap[this.id]) {
         $('#' + this.id).remove();       
-        //console.log('removing ' + this.id); 
       }       
     });    
   }
@@ -414,10 +412,9 @@ var zpr = function(viewFinderId, inputValues) {
     
     imgFrameAttrs.relativeLoc.x = 
       (Math.round((viewFinder.width() / 2) - imgFrame.position().left) / imgFrame.width()).toFixed(2);
-            
+
     imgFrameAttrs.relativeLoc.y = 
-      (Math.round((viewFinder.height() / 2) - imgFrame.position().top) / imgFrame.height()).toFixed(2);    
-    //console.log('relative loc: ' + imgFrameAttrs.relativeLoc.x + ',' + imgFrameAttrs.relativeLoc.y);
+      (Math.round((viewFinder.height() / 2) - imgFrame.position().top) / imgFrame.height()).toFixed(2);
   }
   
   
@@ -600,7 +597,6 @@ var zpr = function(viewFinderId, inputValues) {
   var drawMarquee = function() {    
     var left = Math.ceil((imgFrameAttrs.relativeLoc.x * marqueeAttrs.imgWidth) - (marqueeAttrs.width / 2));
     var top = Math.ceil((imgFrameAttrs.relativeLoc.y * marqueeAttrs.imgHeight) - (marqueeAttrs.height / 2));
-    //console.log('marquee: ' + marqueeAttrs.width + ',' + marqueeAttrs.height + ',' + left + ',' + top);        
     
     $('#' + viewFinderId + '-marquee').css({
       'left': left + 'px',

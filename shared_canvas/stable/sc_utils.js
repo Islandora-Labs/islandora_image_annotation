@@ -95,14 +95,13 @@ function fetchTriples(uri, qry, fn) {
 
   $.ajax({
     type:'POST',
-
+    async:false,
     url: uri,
     // + '?' + new Date().toString(),
     // accepts: "application/rdf+xml",
     success: function(data, status, xhr) {
       try {
         var resp = qry.databank.load(data);
-                       
       } catch(e) {
         alert('Broken RDF/XML: ' + e)
       }

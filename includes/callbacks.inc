@@ -218,7 +218,6 @@ function islandora_image_annotation_shared_get_annotation($pid, $urn = NULL) {
   // Remove the doc type declarations.
   $results = preg_replace('/<\?xml.*?\?>/', '', $results);
   $results = preg_replace('/<!DOCTYPE.*?>/', '', $results);
-
   echo $results;
 }
 

@@ -12,6 +12,4 @@
        <div id="svg_wrapper"></div>
        <!--  Wrapper to create annotations in, then reposition -->
        <div id="annotations"></div>
-       <!-- Progress bar -->
-       <div id="loadprogress"></div>
        </div>

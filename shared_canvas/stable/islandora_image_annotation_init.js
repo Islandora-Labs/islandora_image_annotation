@@ -187,7 +187,7 @@ function init_ui() {
     $(window).resize(function() {
         resizeCanvas();
     });
-
+  resizeCanvas();
 }
 
 var timeout = false;
@@ -205,7 +205,7 @@ function maybeResize() {
     timeout = false;
     var w = $('#canvas-body').width();
     var image_element = $('.base_img').children(":first");
-    console.log("maby resize numCanvases: " + topinfo['numCanvases']);
+    
     initCanvas(topinfo['numCanvases']);
     image_element.width(w);
     image_element.css("height", "auto");
@@ -248,7 +248,6 @@ $(document).ready(function(){
             $.contextMenu({
                 selector : '.comment_title',
                 callback : function(key, options) {
-
                     var urn = $(this).attr('id');
                     urn = urn.substring(5,100);
                     var title = $(this).text().substring(2,100);
@@ -400,7 +399,6 @@ $(document).ready(function(){
                 nCanvas = parseInt(val);
                 uriparams['n'] = nCanvas;
             }
-            console.log("nCanvas value: " + nCanvas);
         }
     }
     topinfo['uriParams'] = uriparams

@@ -44,10 +44,6 @@
     </div>
     <!-- Footer -->
     <div id="islandora_shared_canvas_footer">
-      <div class="shared-canvas-logo" style="font-size:8pt">
-        <img height="15" src="<?php print $images_path; ?>/small-logo.png" style="padding: 0px; margin: 0px; border: 0px; border-top: 2px;" />
-        Powered by SharedCanvas
-      </div>
     </div>
   </div>
 </div>

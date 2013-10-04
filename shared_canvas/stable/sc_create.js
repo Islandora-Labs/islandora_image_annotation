@@ -7,12 +7,7 @@
 
 
 var outsideStyle = islandora_getOutsideStyle()
-//{
-//    fill: 'none',
-//    opacity: 'none',
-    
- //   stroke: 'black'
-//};
+
 var insideStyle = {
     fill: '#FFFFFF',
     opacity: 0.3,
@@ -27,12 +22,9 @@ function fetch_comment_annotations() {
 }
 
 function maybe_config_create_annotation() {
-		
     $('#create_annotation').click(startAnnotating);
-    $('.diabutton').button();
     $('#cancelAnno').click(closeAndEndAnnotating);
     $('#saveAnno').click(saveAndEndAnnotating);
-
 
     $('.annoShape').click(function() {
         var typ = $(this).attr('id').substr(10,5);
@@ -43,11 +35,9 @@ function maybe_config_create_annotation() {
 	
     var shp = $('.annoShape').filter(':first');
     shp.css('border', '1px solid black');
-    topinfo['svgAnnoShape'] = shp.attr('id').substr(10,5);
-	
-// Install PasteBin
-//islandora_init();
-
+    if(shp != null) {
+      topinfo['svgAnnoShape'] = shp.attr('id').substr(10,5);
+    }
 }
 
 function startAnnotating() {
@@ -80,7 +70,7 @@ function startEditting(title, annotation, annoType, urn) {
     $('#create_annotation').empty().append('Annotating');
     $('#create_annotation_box').dialog('open');
     $('.ui-widget-overlay').remove();
-    
+
     $('#anno_title').val(title);
     $('#anno_text').val(annotation);
     $('#anno_classification').val(annoType);
@@ -98,6 +88,7 @@ function saveAndEndAnnotating() {
         // After rebuild, resize.
         resizeCanvas();
     }
+    return okay;
 }
 
 function closeAndEndAnnotating() {
@@ -130,7 +121,6 @@ function closeAndEndAnnotating() {
     $('#anno_text').val('');
     $('#anno_aboutCanvas').prop('checked', false);
     $('#anno_isResource').prop('checked', false);
-    $('#annotation_tab').tabs('select', 0);
     var tabs = $('#tabs').tabs();
     tabs.tabs('select', 3);
 
@@ -142,7 +132,6 @@ function closeAndEndAnnotating() {
 //converting between page clicks and canvas clicks
 
 function initForCreate(canvas) {
-	
     var r = mk_raphael('comment', canvas, topinfo['canvasDivHash'][canvas])
     var invScale = 1.0 / r.newScale;
     var ch = Math.floor(r.height * invScale);
@@ -151,23 +140,19 @@ function initForCreate(canvas) {
 	
     // Ensure we're above all painting annos
     $(prt).css('z-index', 1001);
-	
     var bg = r.rect(0,0,cw,ch);
     bg.attr({
         'fill': 'white',
         'opacity': 0.15
     });
-    // bg.toBack();
     bg.creating = null;
     bg.invScale = invScale;
     bg.myPaper = r;
     bg.myShapes = [];
     r.annotateRect = bg;
-	
     bg.drag(function(dx,dy) {
-        this.creating.resizeFn(dx, dy)
+        this.creating.resizeFn(dx, dy);
     }, switchDown, switchUp);
-	
 }
 
 function destroyAll(canvas) {
@@ -192,7 +177,6 @@ function destroyAll(canvas) {
 }
 
 function saveAnnotation() {
- 
     // Basic Sanity Check
     var title = $('#anno_title').val();
     if($("#anno_title").get(0).tagName == 'SELECT'){
@@ -204,10 +188,8 @@ function saveAnnotation() {
     var color = '';
 
     //check to see if color box has been activated
-    if($('#anno_color_activated').attr('value') == 'active'){
-        color = $('#anno_color').attr('value');
-    }
-  
+    color = $('#anno_color').attr('value');
+
     if($('#saveAnno').text() == 'Update Annotation'){
         urn = $('#saveAnno').attr('urn');
         islandora_updateAnno(urn, title, annoType, content, color);
@@ -235,7 +217,6 @@ function saveAnnotation() {
         format:'text/turtle',
         serialize:true
     });
-    // var data = $(rdfa).rdf().databank.dump({format:'application/rdf+xml',serialize:true});
     var type = $('#anno_classification').val();
     // add category to annoblock before saving annotation.  Fixes concurrency errors
 
@@ -284,7 +265,6 @@ function nodeToXml(what) {
     xml += ("></svg:" + what.nodeName+'>');
     return xml;
 }
-
 
 function create_rdfAnno() {
 
@@ -397,7 +377,6 @@ function create_rdfAnno() {
     var target = null;
     $('#canvases .canvas').each(function() {
         var cnv = $(this).attr('canvas');
-        // var cnv = islandora_canvas_params.object_base +'/Canvas';
         if(cnv){
             if (tgtsCanvas == true) {
                 target = cnv;
@@ -409,10 +388,7 @@ function create_rdfAnno() {
                 for (s in stuff) {
                     target = cnv;
                     var svgxml = nodeToXml(stuff[s].node);
-                    //svgxml = svgxml.replace("stroke='#000000'" , "stroke='" + color +  "'")
-                    //if(strokeWidth == ''){
-                    //   svgxml = svgxml.replace("stroke-width='.3%'" , "stroke-width= ." + strokeWidth +  "%")
-                    //}
+                    svgxml = svgxml.replace("stroke='#000000'" , "stroke='" + color +  "'")
                     svgxml = svgxml.replace('<', '&lt;');
                     svgxml = svgxml.replace('<', '&lt;');
                     svgxml = svgxml.replace('>', '&gt;');
@@ -484,9 +460,6 @@ function fixXY(what, x, y) {
     y-= offsetTop;
     x -= offsetLeft;
 	
-    // And for scroll in window
-    /*var pageOffsetTop = $('body').scrollTop();
-    var pageOffsetLeft = $('body').scrollLeft();*/
     // Change made to support embeding shared canvas.
     var pageOffsetTop = $(window).scrollTop();
     var pageOffsetLeft = $(window).scrollLeft();
@@ -583,9 +556,7 @@ function mkPoly(what, x,y) {
     var r = what.myPaper;
     var s = r.set();
     var outer = r.path("M" +x + ',' + y);
-    // $(outer.node).addClass('outsideSvg')
     var outsideStyle = islandora_getOutsideStyle();
-  
     outer.attr(outsideStyle);
     outer.attr()
     outer.addPoint = addPointFn;
@@ -630,14 +601,12 @@ function mkCircle(what, x,y) {
     var r = what.myPaper;
     var st = r.set();
     var outer = r.circle(x,y,innerSize);
-    // $(outer.node).addClass('outsideSvg')
     var outsideStyle = islandora_getOutsideStyle();
     outer.attr(outsideStyle);
     outer.start = [x,y,innerSize];
     outer.set = st;
 	
     var inner = r.circle(x, y, 0);
-    // $(inner.node).addClass('insideSvg');
     inner.attr(insideStyle);
     inner.toFront();
     inner.set = st;
@@ -706,12 +675,10 @@ function mkRect(what, x,y) {
     var outer = r.rect(x,y, innerSize,innerSize);
     var outsideStyle = islandora_getOutsideStyle();
     outer.attr(outsideStyle);
-    // $(outer.node).addClass('outsideSvg')
     outer.set = st;
 	
     var inner = r.rect(x,y, innerSize+1,innerSize+1);
     inner.attr(insideStyle);
-    // $(inner.node).addClass('insideSvg')
     inner.toFront();
     inner.set = st;
 
@@ -730,20 +697,11 @@ function mkRect(what, x,y) {
 }
 
 function islandora_getOutsideStyle(){
-    var color = 'black';
-
-    //check to see if color box has been activated
-    if($('#anno_color_activated').attr('value') == 'active'){
-        color = $('#anno_color').attr('value');
-    }
-     var outsideStyle = {
+    var outsideStyle = {
         fill: 'none',
         opacity: 'none',
         'stroke-width': + $('#stroke_width').val() + '%' ,
-        stroke: color
+        stroke: $('#anno_color').attr('value')
     };
-    //if (color != ''){
-    //    outsideStyle.color = color;
-    //}
     return outsideStyle;
 }

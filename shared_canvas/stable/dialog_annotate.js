@@ -53,9 +53,10 @@ function annotation_dialog() {
     width: 380,
     buttons: {
     'Save': function() {
-      saveAndEndAnnotating();
-      annotation_dialog.dialog('close');
-      closeAndEndAnnotating();
+      if(saveAndEndAnnotating() == 1) {
+        annotation_dialog.dialog('close');
+        closeAndEndAnnotating();
+      }
     },
     'Cancel': function() {
       closeAndEndAnnotating();
