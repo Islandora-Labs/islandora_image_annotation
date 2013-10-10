@@ -32,7 +32,7 @@ function islandora_getList() {
     islandora_canvas_params.strokeWidth = new Array;
     $.ajax({
         type:'GET',
-        async:true,
+        async:false,
         url: islandora_canvas_params.get_annotation_list_url,
         success: function(data,status,xhr) {
             var listdata = $.parseJSON(data);
@@ -59,7 +59,7 @@ function islandora_getList() {
                         }
                     }
                     var cnv = $(this).attr('canvas');
-	                islandora_getAnnotation(pid);
+	                //islandora_getAnnotation(pid);
                     var type = temp;
                 }
             if( listdata!= null && pids != null){

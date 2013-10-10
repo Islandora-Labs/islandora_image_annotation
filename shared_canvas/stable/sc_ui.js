@@ -121,7 +121,6 @@ function show_seqSel(seqs) {
 // Painting Canvases
 
 function showPages() {
-
   // Empty current display
   $('#annotations').empty();
   $('#audio_annotations').empty();
@@ -873,16 +872,16 @@ function paint_commentAnno(anno, canvasId) {
 var svgAreaColors = ['#FF0000', '#FF6600', '#FF9400', '#FEC500', '#FFFF00', '#8CC700', '#0FAD00', '#00A3C7', '#0064B5', '#0010A5', '#6300A5', '#C5007C']
 
 function paint_commentAnnoTargets(ttldiv, canvasId, annoId, annoType) {
-
+  var col;
   var canvas = $('#' + canvasId).attr('canvas');
   var annos = topinfo['annotations']['comment'][canvas];
   for (var a = 0, anno; anno = annos[a]; a++) {
     if (anno.id == 'urn:uuid:' + annoId) {
       // Paint it up
       if (!svgAreaColors) {
-        var col = '#a0f060';
+        col = '#a0f060';
       } else {
-        var col = svgAreaColors.splice(0,1)[0];
+        col = svgAreaColors.splice(0,1)[0];
       }
       if(islandora_canvas_params.mappings['urn:uuid:' + annoId] != ''){
         col = islandora_canvas_params.mappings[['urn:uuid:' + annoId]];
@@ -895,7 +894,10 @@ function paint_commentAnnoTargets(ttldiv, canvasId, annoId, annoType) {
         strokeWidth = $('#stroke_width').val();
       }
       
-
+      // Fix for google chrome not getting the color.
+      if(typeof col == 'undefined'){
+        col = $('#anno_color').attr('value');
+      }
       $(ttldiv).append('<span color="' + col + '" class="mycolor" style="margin-right: 2px; margin-top: 2px; background: '+col+';float:right;width:15px;height:15px;">&nbsp;</span>');
       for (var t = 0, tgt; tgt = anno.targets[t]; t++) {
         if (tgt.partOf != null) {
