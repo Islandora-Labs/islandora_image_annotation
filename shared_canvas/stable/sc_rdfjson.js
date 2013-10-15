@@ -4,7 +4,6 @@ function buildAllAnnos(query, type) {
   query.reset();
 
   var dump = query.databank.dump();
-
   if (type != undefined) {
     var typres = query.where('?anno a ' + type);
   }
@@ -14,7 +13,6 @@ function buildAllAnnos(query, type) {
     annos[this.anno.value.toString()]=1;
   });
   query.reset();
-
   return queryToJson(annos, dump);
 }
 
@@ -88,7 +86,12 @@ jAnno.prototype.extractInfo = function(info) {
   if (me[nss['dc']+'type'] != undefined) {
     this.annoType = me[nss['dc']+'type'][0]['value'];
   }
-
+  if (me[nss['dcterms']+'relation'] != undefined) {
+    this.relation = me[nss['dcterms']+'relation'][0]['value'];
+  }
+  if (me[nss['dcterms']+'hasPart'] != undefined) {
+    this.hasPart = me[nss['dcterms']+'hasPart'][0]['value'];
+  }
 }
 
 var extractSimple = function(info) {
@@ -107,6 +110,12 @@ var extractSimple = function(info) {
   }
   if (me[nss['dc']+'title'] != undefined) {
     this.title = me[nss['dc']+'title'][0]['value'];
+  }
+  if (me[nss['dcterms']+'relation'] != undefined) {
+    this.relation = me[nss['dcterms']+'relation'][0]['value'];
+  }
+  if (me[nss['dcterms']+'hasPart'] != undefined) {
+    this.hasPart = me[nss['dcterms']+'hasPart'][0]['value'];
   }
   if (me[nss['cnt']+'chars'] != undefined) {
     this.value = me[nss['cnt']+'chars'][0]['value'];
@@ -141,6 +150,8 @@ function jBodyTarget(id) {
   this.fragmentType = "";
   this.types = [];
   this.title = "";
+  this.relation = "";
+  this.hasPart = "";
   this.creator = null;
   this.value = "";
   this.constraint = null;
@@ -237,6 +248,8 @@ function jResource(id) {
   this.title = "";
   this.creator = null;
   this.value = "";
+  this.relation = "";
+  this.hasPart = "";
 
   this.format = "";
   this.height = 0;

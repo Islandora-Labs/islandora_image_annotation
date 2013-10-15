@@ -127,6 +127,17 @@ function islandora_image_annotation_canvas_init($pid) {
 function islandora_image_annotation_include_common_js() {
   $image_annotation_module_path = drupal_get_path('module', 'islandora_image_annotation');
 
+  $allow_entity_linking = variable_get('annotation_use_entity_tagging', TRUE);
+  drupal_add_js(array('islandora_image_annotation' => array('allow_entity_linking' => $allow_entity_linking)), 'setting');
+
+  $images_path = url($image_annotation_module_path . '/shared_canvas/imgs', array('absolute' => TRUE));
+  $entity_link_path = url('islandora/object/', array('absolute' => TRUE));
+  drupal_add_js(array('islandora_image_annotation' => array('images_path' => $images_path)), 'setting');
+  drupal_add_js(array('islandora_image_annotation' => array('entity_link_path' => $entity_link_path)), 'setting');
+  drupal_add_js(array('islandora_image_annotation' => array('entities_search_callback' => url('islandora/entities/search'))), 'setting');
+  drupal_add_js($image_annotation_module_path . '/shared_canvas/stable/entity_search.js');
+
+  drupal_add_js($image_annotation_module_path . '/shared_canvas/stable/dialog_annotate.js');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/jquery/jquery.watermark.min.js');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/js/ContextMenu/jquery.contextMenu.js');
 

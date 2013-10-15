@@ -40,9 +40,7 @@ function islandora_image_annotation_add_annotation($pid) {
   else {
     $stroke_width = 0;
   }
-
   $annotation_xml = islandora_image_annotation_shared_transform_annotation_list(urldecode($_POST['data']), 'html');
-
   $color = $_POST['color'];
   $type = $_POST['type'];
   if (!$type) {
@@ -50,6 +48,7 @@ function islandora_image_annotation_add_annotation($pid) {
   }
   $xml = simplexml_load_string($annotation_xml);
   $labels = $xml->xpath('//dc:title');
+  $entity = $xml->xpath('//dcterms:relation');
   $annotations = $xml->xpath('//rdf:type[@rdf:resource="http://www.w3.org/ns/openannotation/core/Annotation"]');
   $parents = $annotations[0]->xpath("parent::*");
   $parent = $parents[0];
@@ -65,9 +64,7 @@ function islandora_image_annotation_add_annotation($pid) {
     array(),
     array('islandora:OACCModel'),
     array($relationship));
-
   $item->label = (string) $labels[0];
-
   $item->relationships->add(ISLANDORA_RELS_EXT_URI, 'targetedBy', $user->name, TRUE);
   $item->relationships->add(ISLANDORA_RELS_EXT_URI, 'targets', $pid);
   if ($color) {
@@ -77,6 +74,9 @@ function islandora_image_annotation_add_annotation($pid) {
   $item->relationships->add('http://islandora.ca/ontology/relsext#', 'isAnnotationType', $type, TRUE);
   $item->relationships->add(ISLANDORA_RELS_EXT_URI, 'hasURN', $urn, TRUE);
   $item->relationships->add(ISLANDORA_RELS_EXT_URI, 'strokeWidth', $stroke_width, TRUE);
+  if ($entity) {
+    $item->relationships->add(ISLANDORA_RELS_EXT_URI, 'isEntity', (string) $entity[0], TRUE);
+  }
   $new_ds = $item->constructDatastream('OAC', 'X');
   $new_ds->label = 'OAC';
   $new_ds->mimetype = 'text/xml';
@@ -113,7 +113,6 @@ function islandora_image_annotation_shared_transform_annotation_list($xml_in, $i
     drupal_set_message(t('@e', array('@e' => check_plain($e->getMessage()))), 'error');
     return " ";
   }
-
   $xsl = new DomDocument();
   $xsl->load($xslts[$input_type]);
   $input = new DomDocument();
@@ -121,7 +120,6 @@ function islandora_image_annotation_shared_transform_annotation_list($xml_in, $i
   $xsl = $proc->importStylesheet($xsl);
   $newdom = $proc->transformToDoc($input);
   $return_xml = $newdom->saveXML();
-
   return $return_xml;
 }
 
@@ -139,7 +137,7 @@ function islandora_image_annotation_shared_get_annotation_pids($pid) {
     PREFIX io: <http://islandora.ca/ontology/relsext#>
     PREFIX fm: <info:fedora/fedora-system:def/model#>
 
-    SELECT ?id ?type ?urn ?strokeWidth ?color  from <#ri>
+    SELECT ?id ?type ?urn ?strokeWidth ?color from <#ri>
     WHERE {
       ?id io:targets <info:fedora/$pid> ;
       io:hasURN ?urn;
@@ -167,7 +165,6 @@ QUERY;
       'strokeWidth' => $object['strokeWidth']['value'],
       'urn' => $object['urn']['value'],
     );
-
     $pids['pids'][] = $itemdata;
     $pids['types'][] = $object['type']['value'];
   }

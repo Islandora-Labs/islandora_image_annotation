@@ -205,7 +205,6 @@ function saveAnnotation() {
     var rinfo = create_rdfAnno();
     var rdfa = rinfo[0];
     var tgt = rinfo[1];
-   
     if (tgt == null) {
         alert('You must draw a shape around the target.');
         return 0;
@@ -275,7 +274,6 @@ function create_rdfAnno() {
 
     });
 
-
     var clss = 'oac:Annotation';
     var fullclss = nss['oa'] +'Annotation';
     var bodyClass = null;
@@ -297,17 +295,31 @@ function create_rdfAnno() {
     rdfa += '<div about="urn:uuid:' + annoUU + '"> '; // Start Anno
     rdfa += ('<a rel="rdf:type" href="'+fullclss+'"></a>');
     rdfa += '<span property="dcterms:created" content="' + now + '"></span> ';
-
     var title = $('#anno_title').val();
     if($("#anno_title").get(0).tagName == 'SELECT'){
         //if title is a select box we want the title not the pid
         title = $('#anno_title option:selected').text();
     }
     var color = $('#anno_color').attr('value');
-   
+    
+    // Check to be sure that entity linking is enabled.
+    if(Drupal.settings.islandora_image_annotation.allow_entity_linking) {
+      // Parse out the entity pid from the inner anchor.
+      var image_entity = $('#hidden_entity').data('entity');
+      var wrapper= document.createElement('a');
+      wrapper.innerHTML= image_entity.data;
+      var div= wrapper.firstChild;
+      var image_entity_id = div.innerHTML;
+      if(image_entity_id != null) {
+        rdfa += '<span property="dcterms:relation" content="' + image_entity_id + '"></span>';
+        rdfa += '<span property="dcterms:hasPart" content="' + image_entity.label + '"></span>';
+      }
+    }
+    
     if (title != '') {
         rdfa += '<span property="dc:title" content="' + title + '"></span>';
     }
+    
     var type = $('#anno_classification').val();
     if(type == ''){
         type = 'unclassified'
@@ -315,7 +327,7 @@ function create_rdfAnno() {
     if (title != '') {
         rdfa += '<span property="dc:type" content="' + type + '"></span>';
     }
-    
+   
     try {
         // XXX Gdata specific, but can send to other services
         var which = $('#create_body input[name="blog_radio"]:radio:checked').attr('id');

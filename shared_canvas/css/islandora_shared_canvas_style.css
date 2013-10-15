@@ -921,11 +921,10 @@ div.mceDropDown {
 #create_annotation_box
 {
   width: 380px;
-  
+  height: 83% !important;
   -webkit-box-shadow: 0px 0px 5px 0px #666; /* Saf3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
           box-shadow: 0px 0px 5px 0px #666; /* Opera 10.5, IE9, FF4+, Chrome 6+, iOS 5 */
 }
-
 #create_annotation_box .annotation-shapes
 {
   display:inline;

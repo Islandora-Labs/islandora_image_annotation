@@ -289,7 +289,6 @@ function fetch_annotations(which, canvas) {
 var ancCnt = 0;
 function cb_process_annoList(qry, uri) {
   ping_progressBar('recv:'+uri);
-  
   var nss = opts.namespaces;
   var allAnnos = topinfo['annotations'];
   var zorder = {};
@@ -471,15 +470,13 @@ function cb_process_annoList(qry, uri) {
 
 function load_commentAnno(data) {
   // RDFA
-  
   var lqry = $(data).rdf();
   if (lqry.databank.size() == 0) {
     // Turtle or RDF/XML
     try {
       lqry = $.rdf(opts).load(data);
     } catch (e) {
-    // alert('broken comment annotation: ' + data)
-			
+     //alert('broken comment annotation: ' + data)
     }
   }
   cb_process_annoList(lqry, '');

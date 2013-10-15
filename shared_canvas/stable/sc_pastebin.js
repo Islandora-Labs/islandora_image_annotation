@@ -26,10 +26,9 @@ function islandora_postData(title, data, type, color) {
 
 // Adds divs for each type
 //
-
 function islandora_getList() {
     islandora_canvas_params.mappings = new Array();
-    islandora_canvas_params.strokeWidth = new Array;
+    islandora_canvas_params.strokeWidth = new Array();
     $.ajax({
         type:'GET',
         async:false,
@@ -64,11 +63,7 @@ function islandora_getList() {
             if( listdata!= null && pids != null){
                 for (var i=0,info;i < pids.length;i++){
                   islandora_canvas_params.mappings[pids[i]['urn']] = pids[i]['color'];
-                  // There was a for each loop here, part of the 
-                  // excessive server post request fix.
-                  var pid = pids[i]['id'];
                   islandora_getAnnotation(pids[i]['id']);
-                  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 }
               }
             }

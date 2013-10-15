@@ -11,7 +11,7 @@
 function islandora_image_annotation_requirements($phase) {
   $requirements = array();
   if ($phase == 'install') {
-    module_load_include('inc', 'islandora', 'includes/tuque');
+    module_load_include('inc', 'islandora', 'includes  uque');
     if (!IslandoraTuque::exists()) {
       $requirements['tuque_library'] = array(
         'title' => 'Tuque',
@@ -39,6 +39,24 @@ function islandora_image_annotation_install() {
  */
 function islandora_image_annotation_uninstall() {
   module_load_include('inc', 'islandora', 'includes/solution_packs');
+  $variables = array(
+    'islandora_paged_content_gs',
+    'islandora_annotation_mappings',
+    'islandora_annotation_enforce_taxonomy',
+    'islandora_annotation_optimized',
+    'annotation_type_search_field',
+    'image_annotation_annotation_stroke_width',
+    'islandora_image_annotation_use_entity_tagging',
+    'annotation_use_title_vocabulary',
+    'annotation_title_search_field',
+    'annotation_genre_search_field',
+    'islandora_solr_request_handler',
+    'annotation_genre_field',
+    'islandora_solr_url',
+    'islandora_solr_content_model_field',
+    'islandora_image_annotation_datastreams'
+  );
+  array_walk($variables, 'variable_del');
   // Uninstall callback.
   islandora_install_solution_pack('islandora_image_annotation', 'uninstall');
 }

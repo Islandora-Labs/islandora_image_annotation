@@ -187,7 +187,6 @@ function init_ui() {
     $(window).resize(function() {
         resizeCanvas();
     });
-  resizeCanvas();
 }
 
 var timeout = false;
@@ -364,6 +363,17 @@ $(document).ready(function(){
             });
         }
     });
+    
+    var stroke_widths = islandora_canvas_params.islandora_anno_stroke_widths.split(" ");
+    var s_options = "";
+    for (var i = 0; i < stroke_widths.length; i++) {
+      s_options += '<option value="'+ stroke_widths[i] + '">' + stroke_widths[i] + '</option>';
+    }
+    $('#stroke-width-wrapper').empty();
+    $('#stroke-width-wrapper').append('<label for"stroke_width">Stroke Width:</label>');
+    $('#stroke-width-wrapper').append('<select id="stroke_width" />');
+    $('#stroke_width').append(s_options);
+    
     // RDF Initializationc
     var rdfbase = $.rdf(opts);
     topinfo['query'] = rdfbase;
@@ -390,7 +400,6 @@ $(document).ready(function(){
         }
     }
     topinfo['uriParams'] = uriparams
-
     // Initialize UI
     init_ui();
     // Setup a basic Canvas with explicit width to scale to from browser width
@@ -400,13 +409,5 @@ $(document).ready(function(){
     fetchTriples(islandora_canvas_params.manifest_url,
                  rdfbase,
                  cb_process_manifest);
-    var stroke_widths = islandora_canvas_params.islandora_anno_stroke_widths.split(" ");
-    var s_options = "";
-    for (var i = 0; i < stroke_widths.length; i++) {
-      s_options += '<option value="'+ stroke_widths[i] + '">' + stroke_widths[i] + '</option>';
-    }
-    $('#stroke-width-wrapper').empty();
-    $('#stroke-width-wrapper').append('<label for"stroke_width">Stroke Width:</label>');
-    $('#stroke-width-wrapper').append('<select id="stroke_width" />');
-    $('#stroke_width').append(s_options);
+    resizeCanvas();
 });
