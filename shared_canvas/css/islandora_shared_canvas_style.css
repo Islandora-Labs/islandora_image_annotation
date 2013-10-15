@@ -1026,11 +1026,11 @@ div.mceDropDown {
   text-align: right;
 }
 
-.canvas {
+/* @XXX hack to not refactor more shared canvas code*/
+#canvases .canvas {
   z-index: -1;
   overflow: hidden;
   position: absolute;
-  /* @XXX hack to not refactor more shared canvas code*/
   width: 0px !important;
   height: 0px !important;
 }

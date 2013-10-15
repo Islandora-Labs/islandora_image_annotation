@@ -210,7 +210,6 @@ function saveAnnotation() {
         alert('You must draw a shape around the target.');
         return 0;
     }
-	
 
     // Save
     var data = $(rdfa).rdf().databank.dump({
@@ -219,14 +218,15 @@ function saveAnnotation() {
     });
     var type = $('#anno_classification').val();
     // add category to annoblock before saving annotation.  Fixes concurrency errors
-
+    if(type == '') {
+      type = 'unclassified';
+    }
     var fixed_cat = type.replace(/[^\w]/g,'');
 
     var type_class = "annoType_" + fixed_cat;
     var blockId = 'islandora_annoType_'+ fixed_cat;
     var contentId = 'islandora_annoType_content_'+ fixed_cat;
     var idSelector = '#' + blockId;
-    
     if($(idSelector).length == 0){
         header =  '<div class = "islandora_comment_type" id = "'+ blockId + '">';
         header += '<div class = "islandora_comment_type_title">' + type + '</div>';
@@ -676,7 +676,6 @@ function mkRect(what, x,y) {
     var outsideStyle = islandora_getOutsideStyle();
     outer.attr(outsideStyle);
     outer.set = st;
-	
     var inner = r.rect(x,y, innerSize+1,innerSize+1);
     inner.attr(insideStyle);
     inner.toFront();

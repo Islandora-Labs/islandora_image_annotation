@@ -73,7 +73,6 @@ function islandora_image_annotation_canvas_init($pid) {
   module_load_include('module', 'taxonomy', 'module');
   global $base_path;
 
-  $stroke_width = variable_get('image_annotation_annotation_stroke_width', '1%');
   $mappings = variable_get('islandora_annotation_mappings', array());
   $optimized = variable_get('islandora_annotation_optimized', TRUE);
   $dropdown = variable_get('islandora_annotation_enforce_taxonomy', TRUE);
@@ -113,8 +112,7 @@ function islandora_image_annotation_canvas_init($pid) {
   $results['islandora_update_annotation'] = url("islandora/anno/update_annotation/");
   $results['islandora_base_url'] = $base_path;
   $results['islandora_anno_use_title_vocab'] = variable_get('annotation_use_title_vocabulary', FALSE);
-  $results['islandora_anno_stroke_width'] = $stroke_width;
-  $results['islandora_anno_stroke_widths'] = variable_get('annotation_stroke_widths', '.3 .6. .9  1.2 1.5');
+  $results['islandora_anno_stroke_widths'] = variable_get('image_annotation_annotation_stroke_width', '.3 .6 .9 1.2 1.5');
   $results['can_choose'] = !$optimized;
 
   return $results;
@@ -162,5 +160,4 @@ function islandora_image_annotation_include_common_css() {
   drupal_add_css($image_annotation_module_path . '/shared_canvas/js/ContextMenu/jquery.contextMenu.css');
   drupal_add_css($image_annotation_module_path . '/shared_canvas/css/jquery.miniColors.css');
   drupal_add_css($image_annotation_module_path . '/shared_canvas/css/sc.css');
-  drupal_add_css($image_annotation_module_path . '/shared_canvas/css/smoothness/jquery-ui-1.8.16.custom.css');
 }
