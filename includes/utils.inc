@@ -74,7 +74,6 @@ function islandora_image_annotation_canvas_init($pid) {
   global $base_path;
 
   $mappings = variable_get('islandora_annotation_mappings', array());
-  $optimized = variable_get('islandora_annotation_optimized', TRUE);
   $dropdown = variable_get('islandora_annotation_enforce_taxonomy', TRUE);
 
   $item = islandora_object_load($pid);
@@ -113,7 +112,6 @@ function islandora_image_annotation_canvas_init($pid) {
   $results['islandora_base_url'] = $base_path;
   $results['islandora_anno_use_title_vocab'] = variable_get('annotation_use_title_vocabulary', FALSE);
   $results['islandora_anno_stroke_widths'] = variable_get('image_annotation_annotation_stroke_width', '.3 .6 .9 1.2 1.5');
-  $results['can_choose'] = !$optimized;
 
   return $results;
 }
@@ -128,6 +126,7 @@ function islandora_image_annotation_include_common_js() {
   $image_annotation_module_path = drupal_get_path('module', 'islandora_image_annotation');
 
   $allow_entity_linking = variable_get('islandora_image_annotation_use_entity_tagging', TRUE);
+  $can_choose = variable_get('islandora_annotation_optimized', TRUE);
   drupal_add_js(array('islandora_image_annotation' => array('allow_entity_linking' => $allow_entity_linking)), 'setting');
 
   $images_path = url($image_annotation_module_path . '/shared_canvas/imgs', array('absolute' => TRUE));
@@ -135,6 +134,7 @@ function islandora_image_annotation_include_common_js() {
   drupal_add_js(array('islandora_image_annotation' => array('images_path' => $images_path)), 'setting');
   drupal_add_js(array('islandora_image_annotation' => array('entity_link_path' => $entity_link_path)), 'setting');
   drupal_add_js(array('islandora_image_annotation' => array('entities_search_callback' => url('islandora/entities/search'))), 'setting');
+  drupal_add_js(array('islandora_image_annotation' => array('can_choose' => $can_choose)), 'setting');
   drupal_add_js($image_annotation_module_path . '/shared_canvas/stable/entity_search.js');
 
   drupal_add_js($image_annotation_module_path . '/shared_canvas/stable/dialog_annotate.js');

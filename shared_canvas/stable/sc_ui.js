@@ -874,6 +874,9 @@ function paint_commentAnno(anno, canvasId) {
 
 
 var svgAreaColors = ['#FF0000', '#FF6600', '#FF9400', '#FEC500', '#FFFF00', '#8CC700', '#0FAD00', '#00A3C7', '#0064B5', '#0010A5', '#6300A5', '#C5007C']
+function get_random_color() {
+  return svgAreaColors[Math.floor(Math.random()*svgAreaColors.length)];
+}
 
 function paint_commentAnnoTargets(ttldiv, canvasId, annoId, annoType) {
   var col;
@@ -897,7 +900,9 @@ function paint_commentAnnoTargets(ttldiv, canvasId, annoId, annoType) {
       } else {
         strokeWidth = $('#stroke_width').val();
       }
-      
+      if(Drupal.settings.islandora_image_annotation.can_choose == 1) {
+          col = get_random_color();
+      }
       // Fix for google chrome not getting the color.
       if(typeof col == 'undefined'){
         col = $('#anno_color').attr('value');

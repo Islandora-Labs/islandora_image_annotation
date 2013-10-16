@@ -668,7 +668,7 @@ div.mceDropDown {
 #tabs .ui-tabs-panel
 {
   float: none;
-  width: 285px;
+  width: 100%;
   padding: 5px 0px 15px !important;
   margin: 0 auto;
 }

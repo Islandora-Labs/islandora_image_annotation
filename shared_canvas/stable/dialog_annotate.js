@@ -46,7 +46,6 @@ function annotation_dialog() {
       '</span>'+
     '</div>'+
   '</div>';
-
   var entity_combobox = ''+
   '<div id="entity_wrapper" class="element-wrap">'+
     '<label for="cboAddEntity">Entity</label>'+
@@ -62,7 +61,7 @@ function annotation_dialog() {
 
   $(document.body).append(html_text);
   $('#islandora_classification').addClass("dialog-entity-group");
-
+  
   // Optionally allow/disallow users from tagging entities.
   if (Drupal.settings.islandora_image_annotation.allow_entity_linking) {
     $('#islandora_classification').append(entity_combobox);
@@ -90,6 +89,15 @@ function annotation_dialog() {
   var annotation_dialog = $('#create_annotation_box');
   return annotation_dialog.dialog({
     modal: true,
+    open: function(event,ui) {
+      // Fix to paint random colors.
+      if(Drupal.settings.islandora_image_annotation.can_choose == 1) {
+        var rcol = get_random_color();
+        $('#anno_color').attr('value',rcol);
+        $('.miniColors-trigger').css('background-color',rcol);
+        $('#color-picker-wrapper').hide();
+      }
+    },
     title: 'Annotate',
     resizable: false,
     closeOnEscape: false,
