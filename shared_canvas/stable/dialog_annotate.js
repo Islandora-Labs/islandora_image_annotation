@@ -9,6 +9,7 @@ function annotation_dialog() {
   var img_base_path = Drupal.settings.islandora_image_annotation.images_path;
   var html_text = ''+
  '<div id="create_annotation_box">'+
+ '<div id="hidden_annotation_type" type="hidden"></div>'+
     '<div style="display:inline; margin-top: 3px; padding-left: 5px;">'+
       '<img id="annoShape_rect" class="annoShape" src="' + img_base_path + '/draw_rect.png" style="padding-left: 2px; padding-top: 1px;"/>'+
       '<img id="annoShape_circ" class="annoShape" src="' + img_base_path + '/draw_circ.png" style="padding-left: 1px;"/>'+
@@ -96,19 +97,21 @@ function annotation_dialog() {
     width: 380,
     buttons: {
     'Save': function() {
-      if(saveAndEndAnnotating() == 1) {
-        annotation_dialog.dialog('close');
+        saveAndEndAnnotating();
         closeAndEndAnnotating();
         // Reset hidden data for the next time this 
         // dialog is used.
         if($('#hidden_entity')) {
           $('#hidden_entity').data('entity','');
         }
-      }
+        $('#hidden_annotation_type').attr('anno_type','');
+        $('#hidden_annotation_type').attr('urn','');
+        annotation_dialog.dialog('close');
     },
     'Cancel': function() {
       closeAndEndAnnotating();
       annotation_dialog.dialog('close');
+      $('#hidden_annotation_type').text('');
     }
   }
   });

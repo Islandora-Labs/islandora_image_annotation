@@ -271,6 +271,8 @@ $(document).ready(function(){
                             var canvas = $(this).attr('canvas');
                             paint_commentAnnoTargets(this, canvas, id);
                         }
+                        $('#hidden_annotation_type').attr('anno_type','Update Annotation');
+                        $('#hidden_annotation_type').attr('urn',urn);
                         startEditting(title, annotation, anno_type, urn)
                     }
                 },

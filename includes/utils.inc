@@ -127,7 +127,7 @@ function islandora_image_annotation_canvas_init($pid) {
 function islandora_image_annotation_include_common_js() {
   $image_annotation_module_path = drupal_get_path('module', 'islandora_image_annotation');
 
-  $allow_entity_linking = variable_get('annotation_use_entity_tagging', TRUE);
+  $allow_entity_linking = variable_get('islandora_image_annotation_use_entity_tagging', TRUE);
   drupal_add_js(array('islandora_image_annotation' => array('allow_entity_linking' => $allow_entity_linking)), 'setting');
 
   $images_path = url($image_annotation_module_path . '/shared_canvas/imgs', array('absolute' => TRUE));
