@@ -2,7 +2,8 @@ name = Islandora Image Annotation
 description = Image annotation for Islandora.
 dependencies[] = islandora
 dependencies[] = islandora_solr
-dependencies[] = islandora_basic_collection
+dependencies[] = jquery_update
+dependencies[] = taxonomy
 package = Islandora Tools
 core = 7.x
 
