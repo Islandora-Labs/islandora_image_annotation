@@ -68,7 +68,7 @@ model.
 
 Current maintainers:
 
-* [Alan Stanley](https://github.com/ajstanley)
+* [Nigel banks](https://github.com/nigelgbanks)
 
 ## Development
 
