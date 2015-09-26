@@ -37,9 +37,16 @@ function islandora_image_annotation_menu() {
       'access callback' => 'islandora_image_annotation_access',
       'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_VIEW, 2),
     ),
-    // Gets the Drupal.settings for all the image annotation widgets, so that it
-    // can be embedded in an AJAX environment, it's not currently used by this
-    // module, but is used by "islandora_cwrc_writer".
+    // @todo Remove all this manifest nonsense and replace with a simpler
+    // system, as it's really just a hold over from the past when shared canvas
+    // actually existed.
+    'islandora/anno/serve' => array(
+      'page callback' => 'islandora_image_annotation_islandora_serve',
+      'type' => MENU_CALLBACK,
+      'access arguments' => array(ISLANDORA_IMAGE_ANNOTATION_VIEW),
+      'file' => 'includes/build_streams.inc',
+    ),
+    // @deprecated
     'islandora/object/%islandora_object/annotation/settings' => array(
       'page callback' => 'islandora_image_annotation_settings',
       'page arguments' => array(2),
@@ -225,21 +232,6 @@ function islandora_image_annotation_theme($existing, $type, $theme, $path) {
     'islandora_image_annotation_shared_canvas_logo' => array(
       'render element' => 'element',
       'file' => 'theme/theme.inc',
-    ),
-    // @deprecated theme function.
-    'islandora_image_annotation_view' => array(
-      'template' => 'theme/islandora-image-annotation-view',
-      'variables' => array('islandora_objects' => NULL),
-      'file' => 'theme/theme.inc',
-    ),
-    // @deprecated theme function.
-    'islandora_anno_list_pane' => array(
-      'template' => 'theme/islandora-list-pane',
-    ),
-    // @deprecated theme function.
-    'islandora_anno_image_pane' => array(
-      'template' => 'theme/islandora-img-pane',
-      'variables' => array('islandora_object' => NULL),
     ),
   );
 }

@@ -8,46 +8,6 @@
  */
 
 /**
- * Builds initial suite of xml's for Shared Canvas installation.
- *
- * @global url $base_url
- *
- * @param string $pid
- *   Pid of the object.
- */
-function islandora_image_annotation_build_manifest($pid) {
-  module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
-  $dsid = islandora_image_annotation_get_dsid_from_model($pid);
-  global $base_url;
-  $item = islandora_object_load($pid);
-
-  $title = $item->label;
-  $file_array = array();
-  $doc_url = "$base_url/islandora/object/$pid/datastream/$dsid/view/";
-  // XML datastreams used by Shared Canvas must be echoed though ajax.
-  $doc_path_url = "$base_url/islandora/anno/serve/$pid";
-  $dimensions = islandora_image_annotation_get_height_and_width($pid);
-
-  $height = $dimensions['height'];
-  $width = $dimensions['width'];
-  $file_array['Manifest'] = islandora_image_annotation_get_manifest($doc_url, $doc_path_url);
-  $file_array['ImageAnnotations'] = islandora_image_annotation_get_image_annotations($doc_url, $doc_path_url, $height, $width, $title);
-  $file_array['NormalSequence'] = islandora_image_annotation_get_normal_sequence($doc_url, $doc_path_url, $pid, $height, $width);
-  $file_array['AnnotationList'] = islandora_image_annotation_get_annotation_list($doc_url, $doc_path_url);
-  $flat_pid = str_replace(':', '_', $pid);
-  $file_path = file_directory_path() . "/$flat_pid/manifest";
-  if (!is_dir($file_path)) {
-    mkdir($file_path, 0777, TRUE);
-  }
-  foreach ($file_array as $name => $content) {
-    $item["$name"]->content = $content;
-  }
-  rmdir($file_path);
-  rmdir(file_directory_path() . "/$flat_pid");
-  return "completed";
-}
-
-/**
  * Returns basic manifest for unpopulated document.
  *
  * @param URL $doc_url

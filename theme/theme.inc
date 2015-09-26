@@ -6,44 +6,6 @@
  */
 
 /**
- * Preprocess hook.
- *
- * @global string $base_url
- *
- * @param array $variables
- *   An array of variables passed from the theme function.
- */
-function islandora_image_annotation_preprocess_islandora_image_annotation_view(&$variables) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-  $message = islandora_deprecated('7.x-1.4', 'use theme("islandora_image_annotation") instead.');
-  watchdog('islandora_image_annotation', '@msg', array('@msg' => filter_xss($message)));
-  // Set preprocessor variables, for use in JavaScript.
-  $variables['anno_list_pane'] = theme('islandora_anno_list_pane');
-  $variables['anno_img_pane'] = theme('islandora_anno_image_pane');
-
-  module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
-  $module_path = drupal_get_path('module', 'islandora_image_annotation');
-
-  // Add css.
-  drupal_add_css($module_path . '/shared_canvas/css/window_behaviors.css');
-  drupal_add_css($module_path . '/shared_canvas/css/islandora_shared_canvas_style.css');
-  drupal_add_css($module_path . '/shared_canvas/css/smoothness/jquery-ui-1.8.16.custom.css');
-
-  // Add JavaScript.
-  drupal_add_js($module_path . '/shared_canvas/js/jquery/jquery-1.7.js');
-  drupal_add_js($module_path . '/shared_canvas/js/jquery/jquery-ui-1.8.13.custom.min.js');
-
-  // Include common JavaScript/CSS.
-  islandora_image_annotation_include_common_js();
-  islandora_image_annotation_include_common_css();
-
-  // Add JavaScript.
-  drupal_add_js(array('islandora_image_annotation' => array('PID' => $variables['islandora_object']->id)), 'setting');
-  $module_path = drupal_get_path('module', 'islandora_image_annotation');
-  drupal_add_js($module_path . '/shared_canvas/stable/islandora_image_annotation_init.js');
-}
-
-/**
  * Implements template_preprocess_theme().
  */
 function template_preprocess_islandora_image_annotation(array &$variables) {

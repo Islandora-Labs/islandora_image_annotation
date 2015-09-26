@@ -16,18 +16,21 @@ define('ISLANDORA_IMAGE_ANNOTATION_NAMESPACE_ORE', 'http://www.openarchives.org/
 define('ISLANDORA_IMAGE_ANNOTATION_NAMESPACE_EXIF', 'http://www.w3.org/2003/12/exif/ns#');
 
 /**
- * Adds an annotation to the give object.
- *
- * The following parameters are expected to be posted for this function to work.
+ * Gets the settings for configuring image annotation module.
  */
 function islandora_image_annotation_settings(AbstractObject $object) {
   module_load_include('inc', 'islandora_image_annotation', 'includes/utils');
+  module_load_include('inc', 'islandora', 'includes/utilities');
+  // Marked as deprecated as this is now passed via Drupal settings to the JS
+  // enviroment.
+  $message = islandora_deprecated('7.x-1.6', 'Use Drupal.settings to pass the settings instead.');
+  watchdog('islandora_image_annotation', '@msg', array('@msg' => filter_xss($message)));
   drupal_json_output(islandora_image_annotation_get_settings($object));
   drupal_exit();
 }
 
 /**
- * Adds an annotation to the give object.
+ * Gets the annotation meta-data for the given object.
  *
  * The following parameters are expected to be posted for this function to work.
  */
@@ -37,13 +40,15 @@ function islandora_image_annotation_get_callback(AbstractObject $object) {
 }
 
 /**
- * Adds an annotation to the give object.
+ * Creates a new annotation object and associates it with the given object.
+ *
+ * This callback expects the annotation meta-data to be contained in the POST
+ * data of the request.
+ * The $_POST data should contain the following fields.
+ *   - data: An RDF document encoded as a fragment of HTML.
  *
  * @todo Change the JS code to post plain RDF so it doesn't need to be
  * converted.
- *
- * The $_POST data should contain the following fields.
- *   - data: An RDF document encoded as a fragment of HTML.
  *
  * @param AbstractObject $object
  *   The object in which the new annotation will 'annotate'.
@@ -64,7 +69,7 @@ function islandora_image_annotation_add_callback(AbstractObject $object) {
 class IslandoraImageAnnotationPropertyMissingException extends Exception {}
 
 /**
- * Create a new annotation object.
+ * Creates a new annotation object and associates it with the given object.
  *
  * @param AbstractObject $object
  *   The object in which the new annotation will 'annotate'.
