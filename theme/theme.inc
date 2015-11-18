@@ -32,9 +32,6 @@ function template_preprocess_islandora_image_annotation(array &$variables) {
     '#theme' => 'islandora_image_annotation_canvas',
     '#object' => $object,
   );
-  $variables['logo'] = array(
-    '#theme' => 'islandora_image_annotation_shared_canvas_logo',
-  );
   // Include required Javascript libraries..
   drupal_add_js("$module_path/lib/jquery/ContextMenu/jquery.contextMenu.js");
   drupal_add_js("$module_path/lib/jquery/miniColors/jquery.miniColors.js");
@@ -221,22 +218,4 @@ function template_preprocess_islandora_image_annotation_canvas(array &$variables
   $module_path = drupal_get_path('module', 'islandora_image_annotation');
   drupal_add_js("$module_path/js/islandora_image_annotation_canvas.js");
   drupal_add_css("$module_path/css/islandora_image_annotation.canvas.css");
-}
-
-/**
- * Implements theme_hook().
- */
-function theme_islandora_image_annotation_shared_canvas_logo() {
-  $module_path = drupal_get_path('module', 'islandora_image_annotation');
-  drupal_add_css("$module_path/css/islandora_image_annotation.logo.css");
-  $image = array(
-    '#theme' => 'image',
-    '#path' => "$module_path/images/small-logo.png",
-    '#attributes' => array(),
-  );
-  $text = t('Powered by SharedCanvas');
-  $attributes = array(
-    'id' => 'islandora-image-annotation-shared-canvas-logo',
-  );
-  return '<div' . drupal_attributes($attributes) . '>' . drupal_render($image) . $text . '</div>';
 }
