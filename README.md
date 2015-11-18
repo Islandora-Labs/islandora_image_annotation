@@ -1,4 +1,4 @@
-# Islandora Image Annotation [![Build Status](https://travis-ci.org/Islandora/islandora_image_annotation.png?branch=7.x)](https://travis-ci.org/Islandora/islandora_image_annotation)
+# Islandora Image Annotation [![Build Status](https://travis-ci.org/Islandora-Labs/islandora_image_annotation.png?branch=7.x)](https://travis-ci.org/Islandora-Labs/islandora_image_annotation)
 
 ## Introduction
 
