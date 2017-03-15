@@ -19,6 +19,7 @@
       <button id="islandora-image-annotation-create-annotation-button"><?php print t('Annotate'); ?></button>
     <?php endif; ?>
     <button id="islandora-image-annotation-full-window-button"><?php print t('Full Window'); ?></button>
+    <button id="islandora-image-annotation-toggle-annotation-display-button" value="show"><?php print t('Show Annotation(s)'); ?></button>
     <div class="clearfix"></div>
     <?php print $canvas; ?>
     <?php print $logo; ?>

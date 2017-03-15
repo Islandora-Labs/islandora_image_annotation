@@ -110,4 +110,42 @@
     }
   };
 
+
+  /**
+   * Toggle the display of all Annotations.
+   *
+   * @type {{attach: attach}}
+   */
+  Drupal.behaviors.islandoraImageAnnotationToggleAnnotationDisplay = {
+    attach: function (context) {
+      var base = '#islandora-image-annotation-toggle-annotation-display-button';
+      $(base, context).once('islandoraImageAnnotationToggleAnnotationDisplay', function () {
+        var that = this;
+        // Conditionally change the label of the button depending on if any
+        // annotations are being displayed or not.
+        Drupal.IslandoraImageAnnotation.on('showAnnotation', function (event, annotation) {
+          $(that).text(Drupal.t('Hide Annotation(s)'));
+        });
+
+        Drupal.IslandoraImageAnnotation.on('hideAnnotation', function (event, annotation) {
+          var list = Drupal.IslandoraImageAnnotationList.getInstance();
+          if (!list.isAnyAnnotationDisplayed()) {
+            $(that).text(Drupal.t('Show Annotation(s)'));
+          }
+        });
+
+        // When clicked toggle the display of annotations depending on if any
+        // are showing.
+        $(this).click(function () {
+          var list = Drupal.IslandoraImageAnnotationList.getInstance();
+          if (list.isAnyAnnotationDisplayed()) {
+            list.hideAllAnnotations();
+          }
+          else {
+            list.showAllAnnotations();
+          }
+        });
+      });
+    }
+  };
 }(jQuery));

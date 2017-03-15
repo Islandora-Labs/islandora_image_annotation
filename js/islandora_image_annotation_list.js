@@ -196,6 +196,24 @@
       if (annotation) {
         canvas.drawAnnotation(annotation);
       }
+      Drupal.IslandoraImageAnnotation.trigger('showAnnotation', annotation || id);
+    },
+
+    /**
+     * Shows all annotations.
+     *
+     * Shows the comment text section of the annotation and the annotation color
+     * icon, also displays the annotation shapes on the canvas for each
+     * annotation.
+     */
+    showAllAnnotations: function () {
+      var that = this;
+      $(".canvas-annotation[annotation]", this.base).each(function () {
+        var id = $(this).attr('annotation');
+        that.showAnnotation(id);
+      });
+      // Open type containers as well.
+      $('.comment-type-content', this.base).show();
     },
 
     /**
@@ -215,6 +233,23 @@
       if (annotation) {
         canvas.hideAnnotation(annotation);
       }
+      Drupal.IslandoraImageAnnotation.trigger('hideAnnotation', annotation || id);
+    },
+
+    /**
+     * Hides all annotations.
+     *
+     * Hides the comment text section of the annotation and the annotation color
+     * icon, also the annotation shapes on the canvas for each annotation.
+     */
+    hideAllAnnotations: function () {
+      var that = this;
+      $(".canvas-annotation[annotation]", this.base).each(function () {
+        var id = $(this).attr('annotation');
+        that.hideAnnotation(id);
+      });
+      // Close type containers as well.
+      $('.comment-type-content', this.base).hide();
     },
 
     /**
@@ -235,6 +270,33 @@
         $('.comment-show-hide', $annotation).text('+');
         that.hideAnnotation(id);
       }
+    },
+
+    /**
+     * Checks if the given annotation is currently visible.
+     *
+     * @param id
+     *   The id of the annotation to check.
+     */
+    isAnnotationDisplayed: function (id) {
+      var $annotation = this.getAnnotationElement(id);
+      return $('.comment-title', $annotation).hasClass('annotation-opened');
+    },
+
+    /**
+     * Checks if any annotation is currently being displayed.
+     */
+    isAnyAnnotationDisplayed: function () {
+      var that = this,
+          any_displayed = false;
+      $(".canvas-annotation[annotation]", this.base).each(function () {
+        var id = $(this).attr('annotation');
+        if (that.isAnnotationDisplayed(id)) {
+          any_displayed = true;
+          return false;
+        }
+      });
+      return any_displayed;
     },
 
     /**

@@ -16,7 +16,8 @@
   height: 100%;
 }
 
-#islandora-image-annotation-full-window-button {
+#islandora-image-annotation-full-window-button,
+#islandora-image-annotation-toggle-annotation-display-button {
   float: right;
   margin: 5px 5px 5px 15px;
 }
